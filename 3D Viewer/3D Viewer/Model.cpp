@@ -175,6 +175,12 @@ void Model::CalculateNormals()
 		normals[index[0]] += glm::cross(
 			glm::vec3(vertices[index[1]] - vertices[index[0]]),
 			glm::vec3(vertices[index[2]] - vertices[index[0]]));
+		normals[index[1]] += glm::cross(
+			glm::vec3(vertices[index[2]] - vertices[index[1]]),
+			glm::vec3(vertices[index[0]] - vertices[index[1]]));
+		normals[index[2]] += glm::cross(
+			glm::vec3(vertices[index[0]] - vertices[index[2]]),
+			glm::vec3(vertices[index[1]] - vertices[index[2]]));
 	}
 
 	for (auto& normal : normals)
