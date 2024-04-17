@@ -50,10 +50,6 @@ void RenderFrame()
 
 	lightingShaders->Use();
 
-	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
-	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
-	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
-
 	lightingShaders->SetVec3("LightColor", lightSource->GetColor());
 	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
 	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
@@ -63,11 +59,9 @@ void RenderFrame()
 	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularStrength());
 	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
 
-	/*modelShaders->Use();
-
-	modelShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
-	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
-	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());*/
+	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
+	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
+	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
 
 	model->Render();
 
@@ -87,9 +81,6 @@ void Cleanup()
 
 void PerformKeysActions(GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
 	float time = deltaTime;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
@@ -107,6 +98,12 @@ void PerformKeysActions(GLFWwindow* window)
 		camera->MoveUp(time);
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		camera->MoveDown(time);
+}
+
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
@@ -114,25 +111,22 @@ void PerformKeysActions(GLFWwindow* window)
 		glfwGetWindowSize(window, &width, &height);
 		camera->Set(width, height);
 	}
-}
 
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_Z && action == GLFW_PRESS)
 		lightSource->SetAmbientStrength(lightSource->GetAmbientStrength() + 0.1f);
-	if (key == GLFW_KEY_X && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_X && action == GLFW_PRESS)
 		lightSource->SetAmbientStrength(lightSource->GetAmbientStrength() - 0.1f);
-	if (key == GLFW_KEY_C && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_C && action == GLFW_PRESS)
 		lightSource->SetSpecularStrength(lightSource->GetSpecularStrength() + 0.1f);
-	if (key == GLFW_KEY_V && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_V && action == GLFW_PRESS)
 		lightSource->SetSpecularStrength(lightSource->GetSpecularStrength() - 0.1f);
-	if (key == GLFW_KEY_B && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_B && action == GLFW_PRESS)
 		lightSource->SetDiffuseStrength(lightSource->GetDiffuseStrength() + 0.1f);
-	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_N && action == GLFW_PRESS)
 		lightSource->SetDiffuseStrength(lightSource->GetDiffuseStrength() - 0.1f);
-	if (key == GLFW_KEY_M && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_M && action == GLFW_PRESS)
 		lightSource->SetSpecularExponent(lightSource->GetSpecularExponent() * 2);
-	if (key == GLFW_KEY_COMMA && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_COMMA && action == GLFW_PRESS)
 		lightSource->SetSpecularExponent(lightSource->GetSpecularExponent() / 2);
 }
 
@@ -143,12 +137,12 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 
 void MouseCallback(GLFWwindow* window, double deltaX, double deltaY)
 {
-	camera->HandlMouseMovement((float)deltaX, (float)deltaY);
+	camera->HandlMouseMovement(static_cast<float>(deltaX), static_cast<float>(deltaY));
 }
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yOffset)
 {
-	camera->HandleMouseScroll((float)yOffset);
+	camera->HandleMouseScroll(static_cast<float>(yOffset));
 }
 
 void InitializeGraphics()
@@ -159,9 +153,9 @@ void InitializeGraphics()
 	glEnable(GL_COLOR_MATERIAL);
 	glDisable(GL_LIGHTING);
 
-	// Eliminam cullngul deoarece modelele vor avea doar fata exterioara
-	// glFrontFace(GL_CCW);
-	// glCullFace(GL_BACK);
+	// Eliminam cullingul deoarece modelele vor avea doar fata exterioara
+	 glFrontFace(GL_CCW);
+	 glCullFace(GL_BACK);
 }
 
 GLFWwindow* InitializeWindow()
@@ -217,7 +211,9 @@ int main(int argc, const char* argv[])
 	lightingShaders = new ShaderProgram("lightingVS.glsl", "lightingFS.glsl");
 	camera = new Camera(SCR_WIDTH, SCR_HEIGHT);
 
-	model = new Model("model.txt");
+	model = new Model("model.txt", true);
+	std::cout << model->GetModelMatrix() << '\n';
+	std::cout << model->GetPosition() << '\n';
 	lightSource = new LightSource(std::move(Model("lightModel.txt")));
 	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0, 1, 2));
 
@@ -226,6 +222,8 @@ int main(int argc, const char* argv[])
 		double currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		model->Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
 
 		DisplayFPS(currentFrame);
 		PerformKeysActions(window);

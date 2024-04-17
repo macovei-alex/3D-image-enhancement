@@ -1,10 +1,10 @@
 #version 330 core
 
-in vec4 MidColor;
+in vec3 MidColor;
 
 out vec4 OutColor;
 
 void main()
 {
-    OutColor = MidColor;
+    OutColor = vec4(MidColor, 1.0f);
 }
