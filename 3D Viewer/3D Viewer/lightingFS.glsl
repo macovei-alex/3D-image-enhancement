@@ -1,8 +1,8 @@
 #version 330 core
 
-in vec3 MidNormal;
 in vec3 MidFragmentPosition;
 in vec3 MidColor;
+in vec3 MidNormal;
 
 out vec4 OutFragmentColor;
 

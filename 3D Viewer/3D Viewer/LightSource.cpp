@@ -44,21 +44,33 @@ glm::vec3 LightSource::GetColor() const
 
 void LightSource::SetAmbientStrength(float ambientStrength)
 {
+	if (0 > ambientStrength || ambientStrength > 1)
+		return;
+
 	this->ambientStrength = ambientStrength;
 }
 
 void LightSource::SetSpecularStrength(float specularStrength)
 {
+	if(0 > specularStrength || specularStrength > 1)
+		return;
+
 	this->specularStrength = specularStrength;
 }
 
 void LightSource::SetDiffuseStrength(float diffuseStrength)
 {
+	if(0 > diffuseStrength || diffuseStrength > 1)
+		return;
+
 	this->diffuseStrength = diffuseStrength;
 }
 
 void LightSource::SetSpecularExponent(int specularExponent)
 {
+	if(0 > specularExponent)
+		return;
+
 	this->specularExponent = specularExponent;
 }
 

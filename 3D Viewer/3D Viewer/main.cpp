@@ -116,6 +116,26 @@ void PerformKeysActions(GLFWwindow* window)
 	}
 }
 
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+		lightSource->SetAmbientStrength(lightSource->GetAmbientStrength() + 0.1f);
+	if (key == GLFW_KEY_X && action == GLFW_PRESS)
+		lightSource->SetAmbientStrength(lightSource->GetAmbientStrength() - 0.1f);
+	if (key == GLFW_KEY_C && action == GLFW_PRESS)
+		lightSource->SetSpecularStrength(lightSource->GetSpecularStrength() + 0.1f);
+	if (key == GLFW_KEY_V && action == GLFW_PRESS)
+		lightSource->SetSpecularStrength(lightSource->GetSpecularStrength() - 0.1f);
+	if (key == GLFW_KEY_B && action == GLFW_PRESS)
+		lightSource->SetDiffuseStrength(lightSource->GetDiffuseStrength() + 0.1f);
+	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+		lightSource->SetDiffuseStrength(lightSource->GetDiffuseStrength() - 0.1f);
+	if (key == GLFW_KEY_M && action == GLFW_PRESS)
+		lightSource->SetSpecularExponent(lightSource->GetSpecularExponent() * 2);
+	if (key == GLFW_KEY_COMMA && action == GLFW_PRESS)
+		lightSource->SetSpecularExponent(lightSource->GetSpecularExponent() / 2);
+}
+
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	camera->Set(width, height);
@@ -139,8 +159,9 @@ void InitializeGraphics()
 	glEnable(GL_COLOR_MATERIAL);
 	glDisable(GL_LIGHTING);
 
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+	// Eliminam cullngul deoarece modelele vor avea doar fata exterioara
+	// glFrontFace(GL_CCW);
+	// glCullFace(GL_BACK);
 }
 
 GLFWwindow* InitializeWindow()
@@ -161,6 +182,7 @@ GLFWwindow* InitializeWindow()
 	}
 
 	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(window, KeyCallback);
 	glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -197,7 +219,7 @@ int main(int argc, const char* argv[])
 
 	model = new Model("model.txt");
 	lightSource = new LightSource(std::move(Model("lightModel.txt")));
-	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0, 1, 0));
+	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0, 1, 2));
 
 	while (!glfwWindowShouldClose(window))
 	{

@@ -34,11 +34,13 @@ Model::Model(Model&& model) noexcept
 	vertexBufferID = model.vertexBufferID;
 	colorBufferID = model.colorBufferID;
 	indexBufferID = model.indexBufferID;
+	normalBufferID = model.normalBufferID;
 
 	model.vertexArrayID = 0;
 	model.vertexBufferID = 0;
 	model.colorBufferID = 0;
 	model.indexBufferID = 0;
+	model.normalBufferID = 0;
 }
 
 Model::Model(const Model& model)
@@ -65,14 +67,12 @@ glm::mat4 Model::GetModelMatrix() const
 
 glm::vec3 Model::GetPosition() const
 {
-	return glm::vec3(modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2]);
+	return glm::vec3(modelMatrix[3]);
 }
 
 void Model::SetPosition(const glm::vec3& position)
 {
-	modelMatrix[3][0] = position.x;
-	modelMatrix[3][1] = position.y;
-	modelMatrix[3][2] = position.z;
+	modelMatrix[3] = glm::vec4(position, 1.0f);
 }
 
 void Model::ReadVertices(std::ifstream& fin)
@@ -117,6 +117,9 @@ void Model::CalculateNormals()
 
 	for (Index& index : indices)
 	{
+		glm::vec3 v1 = glm::vec3(vertices[index[1]] - vertices[index[0]]);
+		glm::vec3 v2 = glm::vec3(vertices[index[2]] - vertices[index[0]]);
+
 		normals[index[0]] += glm::cross(
 			glm::vec3(vertices[index[1]] - vertices[index[0]]),
 			glm::vec3(vertices[index[2]] - vertices[index[0]]));
@@ -124,7 +127,8 @@ void Model::CalculateNormals()
 
 	for (Normal& normal : normals)
 	{
-		normal = glm::normalize(normal);
+		if(glm::length(normal) > 0.0f)
+			normal = glm::normalize(normal);
 	}
 }
 
