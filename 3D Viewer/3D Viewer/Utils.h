@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <glm.hpp>
 
 enum Layout : GLenum
 {
@@ -15,3 +16,8 @@ enum Count : GLenum
 	One,
 	Two
 };
+
+namespace glm
+{
+	typedef glm::vec<3, unsigned int> vec3u;
+}

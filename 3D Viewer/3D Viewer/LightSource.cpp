@@ -37,9 +37,9 @@ int LightSource::GetSpecularExponent() const
 	return specularExponent;
 }
 
-glm::vec3 LightSource::GetColor() const
+glm::vec3 LightSource::GetLightColor() const
 {
-	return color;
+	return lightColor;
 }
 
 void LightSource::SetAmbientStrength(float ambientStrength)
@@ -74,7 +74,7 @@ void LightSource::SetSpecularExponent(int specularExponent)
 	this->specularExponent = specularExponent;
 }
 
-void LightSource::SetColor(const glm::vec3& color)
+void LightSource::SetLightColor(const glm::vec3& color)
 {
-	this->color = color;
+	this->lightColor = color;
 }

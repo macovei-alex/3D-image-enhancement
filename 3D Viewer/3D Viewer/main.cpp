@@ -16,18 +16,16 @@
 #pragma comment (lib, "glew32s.lib")
 #pragma comment (lib, "OpenGL32.lib")
 
-constexpr unsigned int SCR_WIDTH = 800;
-constexpr unsigned int SCR_HEIGHT = 600;
-
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-
-unsigned int VaoId, VboId, IboId, ColorBufferId;
+constexpr unsigned int SCREEN_WIDTH = 800;
+constexpr unsigned int SCREEN_HEIGHT = 600;
 
 ShaderProgram* modelShaders, * lightingShaders;
 Camera* camera;
 Model* model;
 LightSource* lightSource;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 void DisplayFPS(double currentTime)
 {
@@ -50,11 +48,7 @@ void RenderFrame()
 
 	lightingShaders->Use();
 
-	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
-	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
-	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
-
-	lightingShaders->SetVec3("LightColor", lightSource->GetColor());
+	lightingShaders->SetVec3("LightColor", lightSource->GetLightColor());
 	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
 	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
 
@@ -63,11 +57,9 @@ void RenderFrame()
 	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularStrength());
 	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
 
-	/*modelShaders->Use();
-
-	modelShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
-	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
-	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());*/
+	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
+	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
+	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
 
 	model->Render();
 
@@ -78,11 +70,6 @@ void RenderFrame()
 	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
 
 	lightSource->GetModel().Render();
-}
-
-void Cleanup()
-{
-	glfwTerminate();
 }
 
 void PerformKeysActions(GLFWwindow* window)
@@ -160,8 +147,8 @@ void InitializeGraphics()
 	glDisable(GL_LIGHTING);
 
 	// Eliminam cullngul deoarece modelele vor avea doar fata exterioara
-	// glFrontFace(GL_CCW);
-	// glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
 }
 
 GLFWwindow* InitializeWindow()
@@ -173,7 +160,7 @@ GLFWwindow* InitializeWindow()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// glfw window creation
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "3D Model Viewer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "3D Model Viewer", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -202,6 +189,8 @@ void Clean()
 	delete camera;
 	delete model;
 	delete lightSource;
+
+	glfwTerminate();
 }
 
 int main(int argc, const char* argv[])
@@ -215,11 +204,11 @@ int main(int argc, const char* argv[])
 
 	modelShaders = new ShaderProgram("modelVS.glsl", "modelFS.glsl");
 	lightingShaders = new ShaderProgram("lightingVS.glsl", "lightingFS.glsl");
-	camera = new Camera(SCR_WIDTH, SCR_HEIGHT);
+	camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	model = new Model("model.txt");
-	lightSource = new LightSource(std::move(Model("lightModel.txt")));
-	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0, 1, 2));
+	model = new Model("model.txt", true);
+	lightSource = new LightSource(std::move(Model("lightModel.txt", false)));
+	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, -2.0f));
 
 	while (!glfwWindowShouldClose(window))
 	{
