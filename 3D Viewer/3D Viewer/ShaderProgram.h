@@ -6,12 +6,12 @@
 
 #include <glm.hpp>
 
-class ShaderPair
+class ShaderProgram
 {
 public:
-	ShaderPair() = delete;
-	ShaderPair(const std::string& vertexPath, const std::string& fragmentPath);
-	~ShaderPair();
+	ShaderProgram() = delete;
+	ShaderProgram(const std::string& vertexPath, const std::string& fragmentPath);
+	~ShaderProgram();
 
 	void Use() const;
 

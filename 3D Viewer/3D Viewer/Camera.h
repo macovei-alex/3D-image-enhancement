@@ -10,6 +10,7 @@ public:
 
 	glm::mat4 GetViewMatrix() const;
 	glm::mat4 GetProjectionMatrix() const;
+	glm::vec3 GetPosition() const;
 
 	void MoveCamera(float xOffset, float yOffset, float zOffset);
 

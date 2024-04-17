@@ -26,6 +26,26 @@ Model::Model(const std::string& filePath)
 	InitBuffers();
 }
 
+Model::Model(Model&& model) noexcept
+	: vertices(std::move(model.vertices)), colors(std::move(model.colors)), indices(std::move(model.indices)), modelMatrix(std::move(model.modelMatrix))
+{
+	vertexArrayID = model.vertexArrayID;
+	vertexBufferID = model.vertexBufferID;
+	colorBufferID = model.colorBufferID;
+	indexBufferID = model.indexBufferID;
+
+	model.vertexArrayID = 0;
+	model.vertexBufferID = 0;
+	model.colorBufferID = 0;
+	model.indexBufferID = 0;
+}
+
+Model::Model(const Model& model)
+	: vertices(model.vertices), colors(model.colors), indices(model.indices), modelMatrix(model.modelMatrix)
+{
+	InitBuffers();
+}
+
 Model::~Model()
 {
 	glDisableVertexAttribArray(1);
@@ -40,6 +60,18 @@ Model::~Model()
 glm::mat4 Model::GetModelMatrix() const
 {
 	return modelMatrix;
+}
+
+glm::vec3 Model::GetPosition() const
+{
+	return glm::vec3(modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2]);
+}
+
+void Model::SetPosition(const glm::vec3& position)
+{
+	modelMatrix[3][0] = position.x;
+	modelMatrix[3][1] = position.y;
+	modelMatrix[3][2] = position.z;
 }
 
 void Model::ReadVertices(std::ifstream& fin)

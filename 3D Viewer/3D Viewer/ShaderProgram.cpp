@@ -1,4 +1,4 @@
-#include "ShaderPair.h"
+#include "ShaderProgram.h"
 
 #include <iostream>
 #include <fstream>
@@ -7,47 +7,47 @@
 #include "Utils.h"
 #include <GL/glew.h>
 
-ShaderPair::ShaderPair(const std::string& vertexPath, const std::string& fragmentPath)
+ShaderProgram::ShaderProgram(const std::string& vertexPath, const std::string& fragmentPath)
 {
 	Init(vertexPath, fragmentPath);
 }
 
-ShaderPair::~ShaderPair()
+ShaderProgram::~ShaderProgram()
 {
 	glDeleteProgram(ID);
 }
 
-void ShaderPair::Use() const
+void ShaderProgram::Use() const
 {
 	glUseProgram(ID);
 }
 
-GLuint ShaderPair::GetID() const
+GLuint ShaderProgram::GetID() const
 {
 	return ID;
 }
 
-void ShaderPair::SetInt(const std::string& locationName, int value) const
+void ShaderProgram::SetInt(const std::string& locationName, int value) const
 {
 	glUniform1i(glGetUniformLocation(ID, locationName.c_str()), value);
 }
 
-void ShaderPair::SetFloat(const std::string& locationName, float value) const
+void ShaderProgram::SetFloat(const std::string& locationName, float value) const
 {
 	glUniform1f(glGetUniformLocation(ID, locationName.c_str()), value);
 }
 
-void ShaderPair::SetVec3(const std::string& locationName, const glm::vec3& value) const
+void ShaderProgram::SetVec3(const std::string& locationName, const glm::vec3& value) const
 {
 	glUniform3fv(glGetUniformLocation(ID, locationName.c_str()), 1, &value[0]);
 }
 
-void ShaderPair::SetMat4(const std::string& locationName, const glm::mat4& mat) const
+void ShaderProgram::SetMat4(const std::string& locationName, const glm::mat4& mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, locationName.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void ShaderPair::Init(const std::string& vertexPath, const std::string& fragmentPath)
+void ShaderProgram::Init(const std::string& vertexPath, const std::string& fragmentPath)
 {
 	std::string vertexCode;
 	std::string fragmentCode;
@@ -101,7 +101,7 @@ void ShaderPair::Init(const std::string& vertexPath, const std::string& fragment
 	glDeleteShader(fragment);
 }
 
-void ShaderPair::CheckCompileErrors(GLuint shaderStencilTesting, const std::string& type)
+void ShaderProgram::CheckCompileErrors(GLuint shaderStencilTesting, const std::string& type)
 {
 	GLint success;
 	GLchar infoLog[1024];

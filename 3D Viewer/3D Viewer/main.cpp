@@ -7,8 +7,9 @@
 
 #include "Camera.h"
 #include "Utils.h"
-#include "ShaderPair.h"
+#include "ShaderProgram.h"
 #include "Model.h"
+#include "LightSource.h"
 
 #include <iostream>
 #include <string>
@@ -25,9 +26,10 @@ float lastFrame = 0.0f;
 
 unsigned int VaoId, VboId, IboId, ColorBufferId;
 
-ShaderPair* shaders;
+ShaderProgram* modelShaders, * lightingShaders;
 Camera* camera;
 Model* model;
+LightSource* lightSource;
 
 void DisplayFPS(double currentTime)
 {
@@ -48,13 +50,30 @@ void RenderFrame()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(shaders->GetID());
+	lightingShaders->Use();
 
-	shaders->SetMat4("ModelMatrix", model->GetModelMatrix());
-	shaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
-	shaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
+	lightingShaders->SetVec3("LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
+	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
+
+	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
+	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
+	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
+
+	lightingShaders->SetFloat("AmbientStrength", lightSource->GetAmbientStrength());
+	lightingShaders->SetFloat("DiffuseStrength", lightSource->GetDiffuseStrength());
+	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularExponent());
+	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
 
 	model->Render();
+
+	modelShaders->Use();
+
+	modelShaders->SetMat4("ModelMatrix", lightSource->GetModel().GetModelMatrix());
+	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
+	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
+
+	lightSource->GetModel().Render();
 }
 
 void Cleanup()
@@ -118,8 +137,6 @@ void InitializeGraphics()
 
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
-
-	model = new Model("model.txt");
 }
 
 GLFWwindow* InitializeWindow()
@@ -153,6 +170,14 @@ GLFWwindow* InitializeWindow()
 	return window;
 }
 
+void Clean()
+{
+	delete modelShaders, lightingShaders;
+	delete camera;
+	delete model;
+	delete lightSource;
+}
+
 int main(int argc, const char* argv[])
 {
 	GLFWwindow* window = InitializeWindow();
@@ -162,9 +187,13 @@ int main(int argc, const char* argv[])
 	}
 	InitializeGraphics();
 
-	shaders = new ShaderPair("VertexShader.glsl", "FragmentShader.glsl");
-	shaders->Use();
+	modelShaders = new ShaderProgram("modelVS.glsl", "modelFS.glsl");
+	lightingShaders = new ShaderProgram("lightingVS.glsl", "lightingFS.glsl");
 	camera = new Camera(SCR_WIDTH, SCR_HEIGHT);
+
+	model = new Model("model.txt");
+	lightSource = new LightSource(std::move(Model("lightModel.txt")));
+	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0, 1, 0));
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -180,9 +209,8 @@ int main(int argc, const char* argv[])
 		glfwPollEvents();
 	}
 
-	delete shaders;
-	delete camera;
-	delete model;
+	Clean();
+	glfwTerminate();
 
 	return 0;
 }

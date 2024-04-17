@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ShaderPair.cpp">
+    <ClCompile Include="ShaderProgram.cpp">
       <Filter>Source FIles</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
@@ -13,6 +13,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source FIles</Filter>
     </ClCompile>
+    <ClCompile Include="LightSource.cpp">
+      <Filter>Source FIles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -21,18 +24,27 @@
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderPair.h">
+    <ClInclude Include="ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LightSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader.glsl">
+    <None Include="modelFS.glsl">
       <Filter>Resources\Shaders</Filter>
     </None>
-    <None Include="VertexShader.glsl">
+    <None Include="modelVS.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="lightingVS.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="lightingFS.glsl">
       <Filter>Resources\Shaders</Filter>
     </None>
   </ItemGroup>
@@ -49,10 +61,16 @@
     <Filter Include="Resources\Shaders">
       <UniqueIdentifier>{03d048a0-11bf-49ad-8191-8da4f869fc11}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Models">
+      <UniqueIdentifier>{57355cff-61d3-40ad-8359-e23e1b891c95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="model.txt">
-      <Filter>Resources</Filter>
+      <Filter>Resources\Models</Filter>
+    </Text>
+    <Text Include="lightModel.txt">
+      <Filter>Resources\Models</Filter>
     </Text>
   </ItemGroup>
 </Project>

@@ -13,11 +13,16 @@ class Model
 {
 public:
 	Model(const std::string& filePath);
+	Model(Model&& model) noexcept;
+	Model(const Model&);
 	~Model();
 
-	glm::mat4 GetModelMatrix() const;
-
 	void Render() const;
+
+	glm::mat4 GetModelMatrix() const;
+	glm::vec3 GetPosition() const;
+
+	void SetPosition(const glm::vec3& position);
 
 private:
 	void ReadVertices(std::ifstream& fin);

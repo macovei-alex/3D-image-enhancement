@@ -20,21 +20,26 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ShaderPair.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="LightSource.h" />
     <ClInclude Include="Model.h" />
-    <ClInclude Include="ShaderPair.h" />
+    <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader.glsl" />
-    <None Include="VertexShader.glsl" />
+    <None Include="lightingFS.glsl" />
+    <None Include="modelFS.glsl" />
+    <None Include="lightingVS.glsl" />
+    <None Include="modelVS.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="lightModel.txt" />
     <Text Include="model.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -59,6 +59,11 @@ glm::mat4 Camera::GetProjectionMatrix() const
 		-height / scaleFactor, height / scaleFactor, -zFar, zFar);
 }
 
+glm::vec3 Camera::GetPosition() const
+{
+	return position;
+}
+
 void Camera::MoveCamera(float xOffset, float yOffset, float zOffset)
 {
 	position += xOffset * right * Camera::SPEED_FACTOR;
