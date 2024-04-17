@@ -112,8 +112,8 @@ void ShaderProgram::CheckCompileErrors(GLuint shaderStencilTesting, const std::s
 		if (!success)
 		{
 			glGetShaderInfoLog(shaderStencilTesting, 1024, NULL, infoLog);
-			std::cout << "ERROR when compiling shader of type: " << type << "\n" 
-				<< infoLog << "\n ---------------------------------------------------" 
+			std::cout << "ERROR when compiling shader of type: " << type << "\n"
+				<< infoLog << "\n ---------------------------------------------------"
 				<< std::endl;
 		}
 	}

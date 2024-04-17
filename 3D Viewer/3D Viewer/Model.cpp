@@ -1,7 +1,11 @@
 #include "Model.h"
 
+#include <iostream>
 #include <fstream>
 #include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
+#include "Utils.h"
 
 Model::Model(const std::string& filePath, bool makeCentered)
 	: modelMatrix(glm::mat4(1.0f))
@@ -15,15 +19,15 @@ Model::Model(const std::string& filePath, bool makeCentered)
 
 	if (colors.size() < vertices.size())
 		colors.insert(colors.end(), vertices.size() - colors.size(), glm::vec3(1.0f));
+
 	else if (colors.size() > vertices.size())
 		colors.resize(vertices.size());
 
-	isCentered = false;
-	if (makeCentered)
-		CenterModel();
-
 	CalculateNormals();
 	InitBuffers();
+
+	if (makeCentered)
+		CenterModel();
 }
 
 Model::Model(Model&& model) noexcept
@@ -41,13 +45,14 @@ Model::Model(Model&& model) noexcept
 	model.colorBufferID = 0;
 	model.indexBufferID = 0;
 	model.normalBufferID = 0;
+	model.isCentered = false;
 }
 
 Model::Model(const Model& model)
 	: vertices(model.vertices), colors(model.colors), indices(model.indices), modelMatrix(model.modelMatrix)
 {
 	InitBuffers();
-	isCentered = false;
+	isCentered = model.isCentered;
 }
 
 Model::~Model()
@@ -62,7 +67,7 @@ glm::mat4 Model::GetModelMatrix() const
 
 glm::vec3 Model::GetPosition() const
 {
-	return glm::vec3(modelMatrix[0][3], modelMatrix[1][3], modelMatrix[2][3]);
+	return glm::vec3(modelMatrix[3]);
 }
 
 void Model::SetPosition(const glm::vec3& position)
@@ -119,7 +124,6 @@ void Model::CenterModel()
 		vertex -= center;
 
 	isCentered = true;
-
 	InitBuffers();
 }
 
@@ -165,15 +169,12 @@ void Model::CalculateNormals()
 
 	for (auto& index : indices)
 	{
+		glm::vec3 v1 = glm::vec3(vertices[index[1]] - vertices[index[0]]);
+		glm::vec3 v2 = glm::vec3(vertices[index[2]] - vertices[index[0]]);
+
 		normals[index[0]] += glm::cross(
 			glm::vec3(vertices[index[1]] - vertices[index[0]]),
 			glm::vec3(vertices[index[2]] - vertices[index[0]]));
-		normals[index[1]] += glm::cross(
-			glm::vec3(vertices[index[2]] - vertices[index[1]]),
-			glm::vec3(vertices[index[0]] - vertices[index[1]]));
-		normals[index[2]] += glm::cross(
-			glm::vec3(vertices[index[0]] - vertices[index[2]]),
-			glm::vec3(vertices[index[1]] - vertices[index[2]]));
 	}
 
 	for (auto& normal : normals)
@@ -195,9 +196,11 @@ void Model::InitBuffers()
 	// se creeaza / se leaga un VAO (Vertex Array Object) - util cand se utilizeaza mai multe VBO
 	glGenVertexArrays(1, &vertexArrayID);
 	glBindVertexArray(vertexArrayID);
+
 	// se activeaza lucrul cu atribute; atributul 0 = pozitie
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(Layout::Location_0, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+
 	// un nou buffer, pentru culoare
 	glGenBuffers(1, &colorBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
@@ -206,6 +209,7 @@ void Model::InitBuffers()
 	// atributul 1 = culoare
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(Layout::Location_1, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+
 	// un nou buffer pentru indexuri
 	glGenBuffers(1, &indexBufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
@@ -218,6 +222,7 @@ void Model::InitBuffers()
 	// atributul 2 = normala
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(Layout::Location_2, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -237,7 +242,7 @@ void Model::Render() const
 
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
