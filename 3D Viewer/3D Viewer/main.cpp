@@ -16,8 +16,8 @@
 #pragma comment (lib, "glew32s.lib")
 #pragma comment (lib, "OpenGL32.lib")
 
-constexpr unsigned int SCR_WIDTH = 800;
-constexpr unsigned int SCR_HEIGHT = 600;
+constexpr unsigned int SCREEN_WIDTH = 800;
+constexpr unsigned int SCREEN_HEIGHT = 600;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -42,41 +42,6 @@ void DisplayFPS(double currentTime)
 		frameCounter = 0;
 		lastPrint = currentTime;
 	}
-}
-
-void RenderFrame()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	lightingShaders->Use();
-
-	lightingShaders->SetVec3("LightColor", lightSource->GetColor());
-	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
-	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
-
-	lightingShaders->SetFloat("AmbientStrength", lightSource->GetAmbientStrength());
-	lightingShaders->SetFloat("DiffuseStrength", lightSource->GetDiffuseStrength());
-	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularStrength());
-	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
-
-	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
-	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
-	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
-
-	model->Render();
-
-	modelShaders->Use();
-
-	modelShaders->SetMat4("ModelMatrix", lightSource->GetModel().GetModelMatrix());
-	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
-	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
-
-	lightSource->GetModel().Render();
-}
-
-void Cleanup()
-{
-	glfwTerminate();
 }
 
 void PerformKeysActions(GLFWwindow* window)
@@ -167,7 +132,7 @@ GLFWwindow* InitializeWindow()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// glfw window creation
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "3D Model Viewer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "3D Model Viewer", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -196,6 +161,38 @@ void Clean()
 	delete camera;
 	delete model;
 	delete lightSource;
+
+	glfwTerminate();
+}
+
+void RenderFrame()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	lightingShaders->Use();
+
+	lightingShaders->SetVec3("LightColor", lightSource->GetColor());
+	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
+	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
+
+	lightingShaders->SetFloat("AmbientStrength", lightSource->GetAmbientStrength());
+	lightingShaders->SetFloat("DiffuseStrength", lightSource->GetDiffuseStrength());
+	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularStrength());
+	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
+
+	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
+	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
+	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
+
+	model->Render();
+
+	modelShaders->Use();
+
+	modelShaders->SetMat4("ModelMatrix", lightSource->GetModel().GetModelMatrix());
+	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
+	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
+
+	lightSource->GetModel().Render();
 }
 
 int main(int argc, const char* argv[])
@@ -209,13 +206,11 @@ int main(int argc, const char* argv[])
 
 	modelShaders = new ShaderProgram("modelVS.glsl", "modelFS.glsl");
 	lightingShaders = new ShaderProgram("lightingVS.glsl", "lightingFS.glsl");
-	camera = new Camera(SCR_WIDTH, SCR_HEIGHT);
+	camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	model = new Model("model.txt", true);
-	std::cout << model->GetModelMatrix() << '\n';
-	std::cout << model->GetPosition() << '\n';
 	lightSource = new LightSource(std::move(Model("lightModel.txt")));
-	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0, 1, 2));
+	lightSource->GetModel().Translate(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -234,7 +229,5 @@ int main(int argc, const char* argv[])
 	}
 
 	Clean();
-	glfwTerminate();
-
 	return 0;
 }
