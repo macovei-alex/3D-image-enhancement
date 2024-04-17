@@ -1,10 +1,12 @@
 #version 330 core
 
-layout(location = 0) in vec4 InPosition;
-layout(location = 1) in vec3 InNormal;
+layout (location = 0) in vec4 InPosition;
+layout (location = 1) in vec3 InColor;
+layout (location = 2) in vec3 InNormal;
 
 out vec3 MidFragmentPosition;
 out vec3 MidNormal;
+out vec3 MidColor;
 
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
@@ -16,4 +18,5 @@ void main()
 	MidNormal = mat3(transpose(inverse(ModelMatrix))) * InNormal;
 
 	gl_Position = ProjectionMatrix * ViewMatrix * vec4(MidFragmentPosition, 1.0);
+	MidColor = vec3(InColor);
 }

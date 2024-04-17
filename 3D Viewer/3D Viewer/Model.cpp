@@ -143,17 +143,16 @@ void Model::InitBuffers()
 
 	// se activeaza lucrul cu atribute; atributul 0 = pozitie
 	glEnableVertexAttribArray(0);
-	//
-	glVertexAttribPointer(Layout::Location_0, sizeof(Vertex) / 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(Layout::Location_0, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
 
 	// un nou buffer, pentru culoare
 	glGenBuffers(1, &colorBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Color), colors.data(), GL_STATIC_DRAW);
 
-	// atributul 1 =  culoare
+	// atributul 1 = culoare
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(Layout::Location_1, sizeof(Color) / 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(Layout::Location_1, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
 
 	// un nou buffer pentru indexuri
 	glGenBuffers(1, &indexBufferID);
@@ -163,6 +162,10 @@ void Model::InitBuffers()
 	glGenBuffers(1, &normalBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
 	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(Normal), normals.data(), GL_STATIC_DRAW);
+
+	// atributul 2 = normala
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(Layout::Location_2, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

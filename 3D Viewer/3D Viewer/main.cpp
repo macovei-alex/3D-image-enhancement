@@ -50,18 +50,24 @@ void RenderFrame()
 
 	lightingShaders->Use();
 
-	lightingShaders->SetVec3("LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
-	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
-
 	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
 	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
 	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
 
+	lightingShaders->SetVec3("LightColor", lightSource->GetColor());
+	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
+	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
+
 	lightingShaders->SetFloat("AmbientStrength", lightSource->GetAmbientStrength());
 	lightingShaders->SetFloat("DiffuseStrength", lightSource->GetDiffuseStrength());
-	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularExponent());
+	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularStrength());
 	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
+
+	/*modelShaders->Use();
+
+	modelShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
+	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
+	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());*/
 
 	model->Render();
 
@@ -160,7 +166,7 @@ GLFWwindow* InitializeWindow()
 	glfwSetScrollCallback(window, ScrollCallback);
 
 	// tell GLFW to capture our mouse
-	// glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 

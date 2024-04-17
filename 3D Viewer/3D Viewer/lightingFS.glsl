@@ -2,13 +2,13 @@
 
 in vec3 MidNormal;
 in vec3 MidFragmentPosition;
+in vec3 MidColor;
 
 out vec4 OutFragmentColor;
 
+uniform vec3 LightColor;
 uniform vec3 LightPosition;
 uniform vec3 ViewPosition;
-uniform vec3 LightColor;
-uniform vec3 ObjectColor;
 
 uniform float AmbientStrength;
 uniform float DiffuseStrength;
@@ -28,7 +28,7 @@ void main()
 	float specularPower = pow(max(dot(viewDirection, reflectionDirection), 0.0), SpecularExponent);
 	vec3 specular = SpecularStrength * specularPower * LightColor;
 
-    vec3 result = (ambient + diffuse + specular) * ObjectColor;
+    vec3 result = (ambient + diffuse + specular) * MidColor;
 
 	OutFragmentColor = vec4(result, 1.0);
 }
