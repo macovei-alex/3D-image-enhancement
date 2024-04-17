@@ -8,6 +8,7 @@
 typedef glm::vec4 Vertex;
 typedef glm::vec4 Color;
 typedef glm::vec<3, unsigned int> Index;
+typedef glm::vec3 Normal;
 
 class Model
 {
@@ -29,6 +30,8 @@ private:
 	void ReadColors(std::ifstream& fin);
 	void ReadIndices(std::ifstream& fin);
 
+	void CalculateNormals();
+
 	void InitBuffers();
 
 private:
@@ -37,6 +40,7 @@ private:
 	std::vector<Vertex> vertices;
 	std::vector<Color> colors;
 	std::vector<Index> indices;
+	std::vector<Normal> normals;
 
-	GLuint vertexArrayID, vertexBufferID, colorBufferID, indexBufferID;
+	GLuint vertexArrayID, vertexBufferID, colorBufferID, indexBufferID, normalBufferID;
 };

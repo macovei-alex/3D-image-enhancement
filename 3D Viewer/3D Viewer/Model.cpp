@@ -23,6 +23,7 @@ Model::Model(const std::string& filePath)
 		colors.resize(vertices.size());
 	}
 
+	CalculateNormals();
 	InitBuffers();
 }
 
@@ -110,6 +111,23 @@ void Model::ReadIndices(std::ifstream& fin)
 	}
 }
 
+void Model::CalculateNormals()
+{
+	normals.resize(vertices.size());
+
+	for (Index& index : indices)
+	{
+		normals[index[0]] += glm::cross(
+			glm::vec3(vertices[index[1]] - vertices[index[0]]),
+			glm::vec3(vertices[index[2]] - vertices[index[0]]));
+	}
+
+	for (Normal& normal : normals)
+	{
+		normal = glm::normalize(normal);
+	}
+}
+
 void Model::InitBuffers()
 {
 	// se creeaza un buffer nou
@@ -142,6 +160,10 @@ void Model::InitBuffers()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(Index), indices.data(), GL_STATIC_DRAW);
 
+	glGenBuffers(1, &normalBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
+	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(Normal), normals.data(), GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -158,6 +180,11 @@ void Model::Render() const
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Normal), (void*)0);
+
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
 	glDrawElements(GL_TRIANGLES, indices.size() * sizeof(Index), GL_UNSIGNED_INT, 0);

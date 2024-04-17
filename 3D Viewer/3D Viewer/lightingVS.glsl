@@ -1,10 +1,10 @@
 #version 330 core
 
-layout(location = 0) in vec3 AbsolutePosition;
-layout(location = 1) in vec3 AbsoluteNormal;
+layout(location = 0) in vec4 InPosition;
+layout(location = 1) in vec3 InNormal;
 
-out vec3 FragmentPosition;
-out vec3 Normal;
+out vec3 MidFragmentPosition;
+out vec3 MidNormal;
 
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
@@ -12,8 +12,8 @@ uniform mat4 ProjectionMatrix;
 
 void main()
 {
-	FragmentPosition = vec3(ModelMatrix * vec4(AbsolutePosition, 1.0));
-	Normal = mat3(transpose(inverse(ModelMatrix))) * AbsoluteNormal;
+	MidFragmentPosition = vec3(ModelMatrix * InPosition);
+	MidNormal = mat3(transpose(inverse(ModelMatrix))) * InNormal;
 
-	gl_Position = ProjectionMatrix * ViewMatrix * vec4(FragmentPosition, 1.0);
+	gl_Position = ProjectionMatrix * ViewMatrix * vec4(MidFragmentPosition, 1.0);
 }
