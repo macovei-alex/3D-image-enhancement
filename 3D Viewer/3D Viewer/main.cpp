@@ -207,8 +207,10 @@ int main(int argc, const char* argv[])
 	camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	model = new Model("model.txt", true);
+	std::cout << model->GetModelMatrix() << std::endl;
+	std::cout << model->GetPosition() << std::endl;
 	lightSource = new LightSource(std::move(Model("lightModel.txt", false)));
-	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, -2.0f));
+	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, -5.0f));
 
 	while (!glfwWindowShouldClose(window))
 	{

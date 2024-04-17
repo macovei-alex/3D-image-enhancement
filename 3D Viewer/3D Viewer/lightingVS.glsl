@@ -16,7 +16,7 @@ void main()
 {
 	MidFragmentPosition = vec3(ModelMatrix * vec4(InPosition, 1.0f));
 	MidNormal = mat3(transpose(inverse(ModelMatrix))) * InNormal;
+	MidColor = InColor;
 
 	gl_Position = ProjectionMatrix * ViewMatrix * vec4(MidFragmentPosition, 1.0);
-	MidColor = InColor;
 }
