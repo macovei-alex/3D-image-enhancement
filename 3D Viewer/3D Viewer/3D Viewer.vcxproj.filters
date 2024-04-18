@@ -16,6 +16,7 @@
     <ClCompile Include="LightSource.cpp">
       <Filter>Source FIles</Filter>
     </ClCompile>
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">

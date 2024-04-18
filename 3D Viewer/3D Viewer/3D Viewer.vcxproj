@@ -137,11 +137,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy lightingFS.glsl "..\x64\Debug\lightingFS.glsl" &amp; copy lightingVS.glsl "..\x64\Debug\lightingVS.glsl" &amp; copy modelFS.glsl "..\x64\Debug\modelFS.glsl" &amp; copy modelVS.glsl "..\x64\Debug\modelVS.glsl" &amp; copy lightModel.txt "..\x64\Debug\lightModel.txt" &amp; copy model.txt "..\x64\Debug\model.txt"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,6 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -158,6 +163,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy lightingFS.glsl "..\x64\Debug\lightingFS.glsl" &amp; copy lightingVS.glsl "..\x64\Debug\lightingVS.glsl" &amp; copy modelFS.glsl "..\x64\Debug\modelFS.glsl" &amp; copy modelVS.glsl "..\x64\Debug\modelVS.glsl" &amp; copy lightModel.txt "..\x64\Debug\lightModel.txt" &amp; copy model.txt "..\x64\Debug\model.txt"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

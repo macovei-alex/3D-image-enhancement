@@ -11,10 +11,13 @@
 
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #pragma comment (lib, "glfw3.lib")
 #pragma comment (lib, "glew32s.lib")
 #pragma comment (lib, "OpenGL32.lib")
+
+namespace fs = std::filesystem;
 
 constexpr unsigned int SCREEN_WIDTH = 800;
 constexpr unsigned int SCREEN_HEIGHT = 600;
@@ -197,6 +200,31 @@ void RenderFrame()
 
 int main(int argc, const char* argv[])
 {
+	std::cout << std::endl;
+
+	const fs::path execPath = fs::canonical(argv[0]).remove_filename();
+
+	fs::path modelPath;
+	if (argc < 2)
+	{
+		modelPath = fs::canonical(execPath / "model.txt");
+		std::cout << "A model file path wasn't give; Using the replacement model from: \n\t" << modelPath << std::endl;
+	}
+	else
+	{
+		modelPath = fs::canonical(argv[1]);
+	}
+
+	if (!fs::exists(modelPath))
+	{
+		std::cout << "There is no model file at \n\t" << modelPath << std::endl;
+		return -1;
+	}
+	else
+	{
+		std::cout << "Model file path: \n\t" << modelPath << std::endl;
+	}
+
 	GLFWwindow* window = InitializeWindow();
 	if (window == nullptr)
 	{
@@ -204,13 +232,28 @@ int main(int argc, const char* argv[])
 	}
 	InitializeGraphics();
 
-	modelShaders = new ShaderProgram("modelVS.glsl", "modelFS.glsl");
-	lightingShaders = new ShaderProgram("lightingVS.glsl", "lightingFS.glsl");
+	const fs::path modelVSPath = fs::canonical(execPath / "modelVS.glsl");
+	const fs::path modelFSPath = fs::canonical(execPath / "modelFS.glsl");
+	const fs::path lightingVSPath = fs::canonical(execPath / "lightingVS.glsl");
+	const fs::path lightingFSPath = fs::canonical(execPath / "lightingFS.glsl");
+	const fs::path lightModelPath = fs::canonical(execPath / "lightModel.txt");
+
+	std::cout << "Loading shaders from \n\t" << modelVSPath << ",\n\t" << modelFSPath << std::endl;
+	modelShaders = new ShaderProgram(modelVSPath.string(), modelFSPath.string());
+
+	std::cout << "Loading shaders from \n\t" << lightingVSPath << ",\n\t" << lightingFSPath << std::endl;
+	lightingShaders = new ShaderProgram(lightingVSPath.string(), lightingFSPath.string());
+
 	camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	model = new Model("model.txt", true);
-	lightSource = new LightSource(std::move(Model("lightModel.txt", true)));
+	std::cout << "Loading model from \n\t" << modelPath << std::endl;
+	model = new Model(modelPath.string(), true);
+
+	std::cout << "Loading light source model from \n\t" << lightModelPath << std::endl;
+	lightSource = new LightSource(std::move(Model(lightModelPath.string(), true)));
 	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+
+	std::cout << std::endl;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -219,6 +262,7 @@ int main(int argc, const char* argv[])
 		lastFrame = currentFrame;
 
 		model->Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
+		//lightSource->GetModel().Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
 
 		DisplayFPS(currentFrame);
 		PerformKeysActions(window);
