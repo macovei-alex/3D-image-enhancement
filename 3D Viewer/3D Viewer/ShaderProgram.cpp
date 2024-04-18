@@ -1,12 +1,5 @@
 #include "ShaderProgram.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-
-#include "Utils.h"
-#include <GL/glew.h>
-
 ShaderProgram::ShaderProgram(const std::string& vertexPath, const std::string& fragmentPath)
 {
 	Init(vertexPath, fragmentPath);

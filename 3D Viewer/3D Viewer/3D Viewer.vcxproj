@@ -96,11 +96,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>..\_external\glew\include;..\_external\glfw\include\GLFW;..\_external\glm;$(IncludePath)</IncludePath>
+    <IncludePath>..\_external\glew\include\GL;..\_external\glfw\include\GLFW;..\_external\glm;$(IncludePath)</IncludePath>
     <LibraryPath>..\_external\glfw\lib-vc2022;..\_external\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\_external\glew\include;..\_external\glfw\include\GLFW;..\_external\glm;$(IncludePath)</IncludePath>
+    <IncludePath>..\_external\glew\include\GL;..\_external\glfw\include\GLFW;..\_external\glm;$(IncludePath)</IncludePath>
     <LibraryPath>..\_external\glfw\lib-vc2022;..\_external\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

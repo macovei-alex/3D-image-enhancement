@@ -1,21 +1,13 @@
-#define GLEW_STATIC
-#include <GL/glew.h>
-
-#include <glfw3.h>
-
-#include "Camera.h"
-#include "Utils.h"
-#include "ShaderProgram.h"
-#include "Model.h"
-#include "LightSource.h"
-
-#include <iostream>
-#include <string>
-#include <filesystem>
-
 #pragma comment (lib, "glfw3.lib")
 #pragma comment (lib, "glew32s.lib")
 #pragma comment (lib, "OpenGL32.lib")
+
+#include "Utils.h"
+
+#include "Camera.h"
+#include "ShaderProgram.h"
+#include "Model.h"
+#include "LightSource.h"
 
 namespace fs = std::filesystem;
 

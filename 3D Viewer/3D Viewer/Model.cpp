@@ -1,11 +1,8 @@
 #include "Model.h"
 
-#include <iostream>
-#include <fstream>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
-
 #include "Utils.h"
+
+#include <fstream>
 
 Model::Model(const std::string& filePath, bool makeCentered)
 	: modelMatrix(glm::mat4(1.0f)), isCentered(false)
@@ -94,7 +91,6 @@ void Model::SetRotation(const glm::vec3& rotation)
 void Model::Translate(const glm::vec3& translation)
 {
 	modelMatrix = glm::translate(modelMatrix, translation);
-	isCentered = false;
 }
 
 void Model::Scale(const glm::vec3& scale)

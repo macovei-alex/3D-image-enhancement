@@ -2,10 +2,6 @@
 
 #include "Utils.h"
 
-#include <string>
-
-#include <glm.hpp>
-
 class ShaderProgram
 {
 public:

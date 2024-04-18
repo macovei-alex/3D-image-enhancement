@@ -1,9 +1,6 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <glm.hpp>
-#include <gl/glew.h>
+#include "Utils.h"
 
 class Model
 {

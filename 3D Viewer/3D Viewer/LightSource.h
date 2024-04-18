@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Utils.h"
 #include "Model.h"
 
 class LightSource
