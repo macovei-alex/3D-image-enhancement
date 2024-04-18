@@ -10,7 +10,7 @@ const float Camera::FOV = 45.0f;
 const float Camera::SPEED_FACTOR = 10.0f;
 const float Camera::MOUSE_SENSITIVITY = 0.05f;
 const float Camera::SPEED_BOOST_MULTIPLIER = 0.1f;
-const glm::vec3 Camera::START_POSITION = glm::vec3(0.5f, 0.5f, 10.0f);
+const glm::vec3 Camera::START_POSITION = glm::vec3(0.0f, 0.0f, 10.0f);
 const glm::vec3 Camera::START_FACING = glm::vec3(0.0f, 0.0f, -1.0f);
 
 Camera::Camera(int width, int height, const glm::vec3& position)
@@ -30,7 +30,7 @@ void Camera::Set(int width, int height, const glm::vec3& position)
 	zNear = Camera::Z_NEAR;
 	zFar = Camera::Z_FAR;
 
-	worldUp = glm::vec3(0, 1, 0);
+	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	this->position = position;
 
 	lastX = width / 2.0f;

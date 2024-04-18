@@ -199,41 +199,39 @@ void Model::CalculateNormals()
 void Model::InitBuffers()
 {
 	// se creeaza un buffer nou
-	glGenBuffers(1, &vertexBufferID);
+	glGenBuffers((int)Count::One, &vertexBufferID);
 	// este setat ca buffer curent
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	// punctele sunt "copiate" in bufferul curent
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), vertices.data(), GL_STATIC_DRAW);
 
 	// se creeaza / se leaga un VAO (Vertex Array Object) - util cand se utilizeaza mai multe VBO
-	glGenVertexArrays(1, &vertexArrayID);
+	glGenVertexArrays((int)Count::One, &vertexArrayID);
 	glBindVertexArray(vertexArrayID);
 
 	// se activeaza lucrul cu atribute; atributul 0 = pozitie
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(Layout::Location_0, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray((int)AtribNumber::Zero);
+	glVertexAttribPointer((int)Layout::Location_0, (int)StepSize::Float, GL_FLOAT, GL_FALSE, (int)SpaceBetween::Zero, (void*)StartOffset::Zero);
 
 	// un nou buffer, pentru culoare
-	glGenBuffers(1, &colorBufferID);
+	glGenBuffers((int)Count::One , &colorBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(colors[0]), colors.data(), GL_STATIC_DRAW);
 
 	// atributul 1 = culoare
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(Layout::Location_1, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray((int)AtribNumber::One);
+	glVertexAttribPointer((int)Layout::Location_1, (int)StepSize::Float, GL_FLOAT, GL_FALSE, (int)SpaceBetween::Zero, (void*)StartOffset::Zero);
 
-	// un nou buffer pentru indexuri
-	glGenBuffers(1, &indexBufferID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), indices.data(), GL_STATIC_DRAW);
-
-	glGenBuffers(1, &normalBufferID);
+	glGenBuffers((int)Count::One, &normalBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
 	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(normals[0]), normals.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray((int)AtribNumber::Two);
+	glVertexAttribPointer((int)Layout::Location_2, (int)StepSize::Float, GL_FLOAT, GL_FALSE, (int)SpaceBetween::Zero, (void*)StartOffset::Zero);
 
-	// atributul 2 = normala
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(Layout::Location_2, sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+	// un nou buffer pentru indexuri
+	glGenBuffers((int)Count::One, &indexBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), indices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
