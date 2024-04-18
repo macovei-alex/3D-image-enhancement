@@ -8,7 +8,7 @@
 #include "Utils.h"
 
 Model::Model(const std::string& filePath, bool makeCentered)
-	: modelMatrix(glm::mat4(1.0f))
+	: modelMatrix(glm::mat4(1.0f)), isCentered(false)
 {
 	std::ifstream fin(filePath);
 	std::string line;
@@ -104,13 +104,9 @@ void Model::Scale(const glm::vec3& scale)
 
 void Model::Rotate(const glm::vec3& rotation)
 {
-	modelMatrix = glm::translate(modelMatrix, -GetPosition());
-
 	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-	modelMatrix = glm::translate(modelMatrix, GetPosition());
 }
 
 void Model::CenterModel()

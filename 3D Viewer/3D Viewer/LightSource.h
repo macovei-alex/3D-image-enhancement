@@ -8,7 +8,6 @@ public:
 	LightSource(const Model& model);
 	LightSource(Model&& model);
 
-	Model& GetModel();
 	float GetAmbientStrength() const;
 	float GetSpecularStrength() const;
 	float GetDiffuseStrength() const;
@@ -19,12 +18,14 @@ public:
 	void SetSpecularStrength(float specularStrength);
 	void SetDiffuseStrength(float diffuseStrength);
 	void SetSpecularExponent(int specularExponent);
-	void SetColor(const glm::vec3& color);
+	void SetLightColor(const glm::vec3& lightColor);
 
-private:
+public:
 	Model model;
 
-	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+private:
+
+	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	float ambientStrength = 0.3f;
 	float specularStrength = 0.5f;

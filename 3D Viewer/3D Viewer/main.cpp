@@ -175,7 +175,7 @@ void RenderFrame()
 	lightingShaders->Use();
 
 	lightingShaders->SetVec3("LightColor", lightSource->GetColor());
-	lightingShaders->SetVec3("LightPosition", lightSource->GetModel().GetPosition());
+	lightingShaders->SetVec3("LightPosition", lightSource->model.GetPosition());
 	lightingShaders->SetVec3("ViewPosition", camera->GetPosition());
 
 	lightingShaders->SetFloat("AmbientStrength", lightSource->GetAmbientStrength());
@@ -191,11 +191,11 @@ void RenderFrame()
 
 	modelShaders->Use();
 
-	modelShaders->SetMat4("ModelMatrix", lightSource->GetModel().GetModelMatrix());
+	modelShaders->SetMat4("ModelMatrix", lightSource->model.GetModelMatrix());
 	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
 	modelShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
 
-	lightSource->GetModel().Render();
+	lightSource->model.Render();
 }
 
 int main(int argc, const char* argv[])
@@ -212,7 +212,7 @@ int main(int argc, const char* argv[])
 	}
 	else
 	{
-		modelPath = fs::canonical(argv[1]);
+		modelPath = fs::absolute(fs::canonical(argv[1]));
 	}
 
 	if (!fs::exists(modelPath))
@@ -251,7 +251,7 @@ int main(int argc, const char* argv[])
 
 	std::cout << "Loading light source model from \n\t" << lightModelPath << std::endl;
 	lightSource = new LightSource(std::move(Model(lightModelPath.string(), true)));
-	lightSource->GetModel().SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+	lightSource->model.SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
 
 	std::cout << std::endl;
 
@@ -262,7 +262,7 @@ int main(int argc, const char* argv[])
 		lastFrame = currentFrame;
 
 		model->Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
-		//lightSource->GetModel().Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
+		lightSource->model.Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
 
 		DisplayFPS(currentFrame);
 		PerformKeysActions(window);
