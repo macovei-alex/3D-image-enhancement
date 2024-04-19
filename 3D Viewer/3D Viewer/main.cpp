@@ -17,8 +17,6 @@ constexpr unsigned int SCREEN_HEIGHT = 600;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-unsigned int VaoId, VboId, IboId, ColorBufferId;
-
 ShaderProgram* modelShaders, * lightingShaders;
 Camera* camera;
 Model* model;
@@ -27,7 +25,7 @@ LightSource* lightSource;
 void DisplayFPS(double currentTime)
 {
 	static int frameCounter = 0;
-	static int lastPrint = glfwGetTime();
+	static double lastPrint = glfwGetTime();
 
 	frameCounter++;
 
@@ -243,18 +241,19 @@ int main(int argc, const char* argv[])
 
 	std::cout << "Loading light source model from \n\t" << lightModelPath << std::endl;
 	lightSource = new LightSource(std::move(Model(lightModelPath.string(), true)));
+
 	lightSource->model.SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
 
 	std::cout << std::endl;
 
 	while (!glfwWindowShouldClose(window))
 	{
-		double currentFrame = glfwGetTime();
+		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
 		model->Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
-		lightSource->model.Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
+		//lightSource->model.Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
 
 		DisplayFPS(currentFrame);
 		PerformKeysActions(window);

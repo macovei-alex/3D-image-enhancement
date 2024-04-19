@@ -2,8 +2,6 @@
 
 #include "Utils.h"
 
-#include <fstream>
-
 Model::Model(const std::string& filePath, bool makeCentered)
 	: modelMatrix(glm::mat4(1.0f)), isCentered(false)
 {
@@ -11,14 +9,16 @@ Model::Model(const std::string& filePath, bool makeCentered)
 	std::string line;
 
 	ReadVertices(fin);
-	ReadColors(fin);
 	ReadIndices(fin);
 
-	if (colors.size() < vertices.size())
-		colors.insert(colors.end(), vertices.size() - colors.size(), glm::vec3(1.0f));
+	if (indices.size() % 3 != 0)
+	{
+		throw std::exception(std::format("The number of indices is not divisible by 3 in model file {}: {}", filePath, indices.size()).data());
+	}
 
-	else if (colors.size() > vertices.size())
-		colors.resize(vertices.size());
+	VAO = 0;
+	VBO = 0;
+	EBO = 0;
 
 	if (makeCentered)
 		CenterModel();
@@ -28,25 +28,21 @@ Model::Model(const std::string& filePath, bool makeCentered)
 }
 
 Model::Model(Model&& model) noexcept
-	: vertices(std::move(model.vertices)), colors(std::move(model.colors)), indices(std::move(model.indices)), normals(std::move(model.normals)), modelMatrix(std::move(model.modelMatrix))
+	: vertices(std::move(model.vertices)), modelMatrix(std::move(model.modelMatrix))
 {
-	vertexArrayID = model.vertexArrayID;
-	vertexBufferID = model.vertexBufferID;
-	colorBufferID = model.colorBufferID;
-	indexBufferID = model.indexBufferID;
-	normalBufferID = model.normalBufferID;
+	VAO = model.VAO;
+	VBO = model.VBO;
+	EBO = model.EBO;
 	isCentered = model.isCentered;
 
-	model.vertexArrayID = 0;
-	model.vertexBufferID = 0;
-	model.colorBufferID = 0;
-	model.indexBufferID = 0;
-	model.normalBufferID = 0;
+	model.VAO = 0;
+	model.VBO = 0;
+	model.EBO = 0;
 	model.isCentered = false;
 }
 
 Model::Model(const Model& model)
-	: vertices(model.vertices), colors(model.colors), indices(model.indices), normals(model.normals), modelMatrix(model.modelMatrix)
+	: vertices(model.vertices), modelMatrix(model.modelMatrix)
 {
 	InitBuffers();
 	isCentered = model.isCentered;
@@ -113,167 +109,140 @@ void Model::CenterModel()
 	DestroyBuffers();
 
 	glm::vec3 center = glm::vec3(0.0f);
-	for (glm::vec3& vertex : vertices)
-		center += vertex;
+	for (auto& vertex : vertices)
+		center += vertex.position;
 
 	center /= vertices.size();
 
-	for (glm::vec3& vertex : vertices)
-		vertex -= center;
+	for (auto& vertex : vertices)
+		vertex.position -= center;
 
 	isCentered = true;
 	InitBuffers();
 }
 
-void Model::ReadVertices(std::ifstream& fin)
+void Model::ReadVertices(std::istream& fin)
 {
 	int vertexCount;
 	fin >> vertexCount;
+
+	vertices.resize(vertexCount);
+
 	for (int i = 0; i < vertexCount; i++)
 	{
 		float x, y, z;
 		fin >> x >> y >> z;
-		vertices.emplace_back(x, y, z);
+		vertices[i].position = glm::vec3(x, y, z);
 	}
-}
 
-void Model::ReadColors(std::ifstream& fin)
-{
 	int colorCount;
 	fin >> colorCount;
 	for (int i = 0; i < colorCount; i++)
 	{
 		float r, g, b;
 		fin >> r >> g >> b;
-		colors.emplace_back(r, g, b);
+		vertices[i].color = glm::vec3(r, g, b);
 	}
+
+	/*
+	for (int i = 0; i < vertexCount; i++)
+	{
+		float nx, ny, nz;
+		fin >> nx >> ny >> nz;
+		vertices[i].normal = glm::vec3(nx, ny, nz);
+	}
+	*/
 }
 
-void Model::ReadIndices(std::ifstream& fin)
+void Model::ReadIndices(std::istream& fin)
 {
-	int indexCount;
+	unsigned int indexCount;
 	fin >> indexCount;
-	for (int i = 0; i < indexCount; i++)
+
+	indices.resize(indexCount * 3);
+
+	for (unsigned int i = 0; i < indexCount * 3; i++)
 	{
-		unsigned int i1, i2, i3;
-		fin >> i1 >> i2 >> i3;
-		indices.emplace_back(i1, i2, i3);
+		unsigned int index;
+		fin >> index;
+		indices[i] = index;
 	}
 }
 
 void Model::CalculateNormals()
 {
-	normals.resize(vertices.size());
-
-	for (auto& index : indices)
+	for (int i = 0; i < indices.size(); i += 3)
 	{
-		glm::vec3 v1 = glm::vec3(vertices[index[1]] - vertices[index[0]]);
-		glm::vec3 v2 = glm::vec3(vertices[index[2]] - vertices[index[0]]);
+		glm::vec3 v1 = vertices[indices[i + 1]].position - vertices[indices[i]].position;
+		glm::vec3 v2 = vertices[indices[i + 2]].position - vertices[indices[i + 1]].position;
+		glm::vec3 v3 = vertices[indices[i]].position - vertices[indices[i + 2]].position;
 
-		normals[index[0]] += glm::cross(
-			glm::vec3(vertices[index[1]] - vertices[index[0]]),
-			glm::vec3(vertices[index[2]] - vertices[index[0]]));
-		normals[index[1]] += glm::cross(
-			glm::vec3(vertices[index[2]] - vertices[index[1]]),
-			glm::vec3(vertices[index[0]] - vertices[index[1]]));
-		normals[index[2]] += glm::cross(
-			glm::vec3(vertices[index[0]] - vertices[index[2]]),
-			glm::vec3(vertices[index[1]] - vertices[index[2]]));
+		vertices[indices[i]].normal += glm::cross(v1, -v3);
+		vertices[indices[i + 1]].normal += glm::cross(v2, -v1);
+		vertices[indices[i + 2]].normal += glm::cross(v3, -v2);
 	}
 
-	for (auto& normal : normals)
+	for (auto& vertex : vertices)
 	{
-		if (glm::length(normal) > 0.0f)
-			normal = glm::normalize(normal);
+		if (glm::length(vertex.normal) > 0.0f)
+			vertex.normal = glm::normalize(vertex.normal);
 	}
 }
 
 void Model::InitBuffers()
 {
-	// se creeaza un buffer nou
-	glGenBuffers((int)Count::One, &vertexBufferID);
-	// este setat ca buffer curent
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	// punctele sunt "copiate" in bufferul curent
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), vertices.data(), GL_STATIC_DRAW);
 
-	// se creeaza / se leaga un VAO (Vertex Array Object) - util cand se utilizeaza mai multe VBO
-	glGenVertexArrays((int)Count::One, &vertexArrayID);
-	glBindVertexArray(vertexArrayID);
+	// vertex Positions
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, dimof(vertices[0].position), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
-	// se activeaza lucrul cu atribute; atributul 0 = pozitie
-	glEnableVertexAttribArray((int)AtribNumber::Zero);
-	glVertexAttribPointer((int)Layout::Location_0, (int)StepSize::Float, GL_FLOAT, GL_FALSE, (int)SpaceBetween::Zero, (void*)StartOffset::Zero);
+	// vertex normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, dimof(vertices[0].normal), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-	// un nou buffer, pentru culoare
-	glGenBuffers((int)Count::One , &colorBufferID);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
-	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(colors[0]), colors.data(), GL_STATIC_DRAW);
+	// vertex texture coords
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, dimof(vertices[0].color), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
 
-	// atributul 1 = culoare
-	glEnableVertexAttribArray((int)AtribNumber::One);
-	glVertexAttribPointer((int)Layout::Location_1, (int)StepSize::Float, GL_FLOAT, GL_FALSE, (int)SpaceBetween::Zero, (void*)StartOffset::Zero);
+	glBindVertexArray(0);
 
-	glGenBuffers((int)Count::One, &normalBufferID);
-	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
-	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(normals[0]), normals.data(), GL_STATIC_DRAW);
-	glEnableVertexAttribArray((int)AtribNumber::Two);
-	glVertexAttribPointer((int)Layout::Location_2, (int)StepSize::Float, GL_FLOAT, GL_FALSE, (int)SpaceBetween::Zero, (void*)StartOffset::Zero);
-
-	// un nou buffer pentru indexuri
-	glGenBuffers((int)Count::One, &indexBufferID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), indices.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 }
 
 void Model::Render() const
 {
-	glBindVertexArray(vertexArrayID);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, nullptr);
 
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-	glDrawElements(GL_TRIANGLES, indices.size() * sizeof(glm::vec3u), GL_UNSIGNED_INT, 0);
-
-	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 void Model::DestroyBuffers()
 {
 	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	if (colorBufferID != 0)
-		glDeleteBuffers(1, &colorBufferID);
-	if (normalBufferID != 0)
-		glDeleteBuffers(1, &normalBufferID);
-	if (indexBufferID != 0)
-		glDeleteBuffers(1, &indexBufferID);
-	if (vertexBufferID != 0)
-		glDeleteBuffers(1, &vertexBufferID);
+	if(EBO != 0)
+		glDeleteBuffers(1, &EBO);
+	if(VBO != 0)
+		glDeleteBuffers(1, &VBO);
+	if(VAO != 0)
+		glDeleteVertexArrays(1, &VAO);
 
-	if (vertexArrayID != 0)
-		glDeleteVertexArrays(1, &vertexArrayID);
-
-	colorBufferID = 0;
-	normalBufferID = 0;
-	indexBufferID = 0;
-	vertexBufferID = 0;
-	vertexArrayID = 0;
+	VAO = 0;
+	VBO = 0;
+	EBO = 0;
 }

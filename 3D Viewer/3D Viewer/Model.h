@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Utils.h"
+#include "Vertex.h"
 
 class Model
 {
@@ -11,6 +12,7 @@ public:
 	~Model();
 
 	void Render() const;
+	void SetupMesh();
 
 	glm::mat4 GetModelMatrix() const;
 	glm::vec3 GetPosition() const;
@@ -26,9 +28,9 @@ public:
 	void CenterModel();
 
 private:
-	void ReadVertices(std::ifstream& fin);
-	void ReadColors(std::ifstream& fin);
-	void ReadIndices(std::ifstream& fin);
+	void ReadVertices(std::istream& fin);
+	void ReadColors(std::istream& fin);
+	void ReadIndices(std::istream& fin);
 
 	void CalculateNormals();
 
@@ -36,12 +38,10 @@ private:
 	void DestroyBuffers();
 
 private:
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> colors;
-	std::vector<glm::vec<3, unsigned int>> indices;
-	std::vector<glm::vec3> normals;
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
 
-	GLuint vertexArrayID, vertexBufferID, colorBufferID, indexBufferID, normalBufferID;
+	GLuint VAO, VBO, EBO;
 
 	glm::mat4 modelMatrix;
 	bool isCentered;

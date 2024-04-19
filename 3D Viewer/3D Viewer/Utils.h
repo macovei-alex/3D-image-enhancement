@@ -13,11 +13,9 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <format>
 
-namespace glm
-{
-	typedef glm::vec<3, unsigned int> vec3u;
-}
+#define dimof(vec) (sizeof(vec) / sizeof(vec[0]))
 
 enum class Layout : GLuint
 {
