@@ -3,13 +3,13 @@
 #include "Utils.h"
 #include "Vertex.h"
 
-class Model
+class Mesh
 {
 public:
-	Model(const std::string& filePath, bool makeCentered = false);
-	Model(Model&& model) noexcept;
-	Model(const Model&);
-	~Model();
+	Mesh(const std::string& filePath, bool makeCentered = false);
+	Mesh(Mesh&& model) noexcept;
+	Mesh(const Mesh&);
+	~Mesh();
 
 	void Render() const;
 

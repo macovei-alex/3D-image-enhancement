@@ -21,9 +21,9 @@
 #define DEBUG
 
 #ifdef DEBUG
-#define GLCall(func) GLClearError(); func; ASSERT(GLLogCall(#func, __FILE__, __LINE__));
+	#define GLCall(func) GLClearError(); func; ASSERT(GLLogCall(#func, __FILE__, __LINE__));
 #else
-#define GLCall(func) func;
+	#define GLCall(func) func;
 #endif
 
 enum class Layout : GLuint

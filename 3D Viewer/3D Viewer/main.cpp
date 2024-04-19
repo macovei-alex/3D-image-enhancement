@@ -6,7 +6,7 @@
 
 #include "Camera.h"
 #include "ShaderProgram.h"
-#include "Model.h"
+#include "Mesh.h"
 #include "LightSource.h"
 
 namespace fs = std::filesystem;
@@ -17,9 +17,9 @@ constexpr unsigned int SCREEN_HEIGHT = 600;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-ShaderProgram* modelShaders, * lightingShaders;
+ShaderProgram* modelShaders, * lightingShaders, * noTransformShaders;
 Camera* camera;
-Model* model;
+Mesh* model;
 LightSource* lightSource;
 
 void DisplayFPS(double currentTime)
@@ -105,7 +105,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yOffset)
 
 void InitializeGraphics()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // culoarea de fond a ecranului
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
@@ -117,7 +117,6 @@ void InitializeGraphics()
 
 GLFWwindow* InitializeWindow()
 {
-	// glfw: initialize and configure
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -149,7 +148,7 @@ GLFWwindow* InitializeWindow()
 
 void Clean()
 {
-	delete modelShaders, lightingShaders;
+	delete modelShaders, lightingShaders, noTransformShaders;
 	delete camera;
 	delete model;
 	delete lightSource;
@@ -160,8 +159,6 @@ void Clean()
 void RenderFrame()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glm::mat4 PVMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
 
 	lightingShaders->Use();
 
@@ -174,8 +171,6 @@ void RenderFrame()
 	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularStrength());
 	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
 
-	glm::mat4 fullLightingShaderMatrix = PVMatrix * model->GetModelMatrix();
-
 	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
 	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
 	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
@@ -183,8 +178,6 @@ void RenderFrame()
 	model->Render();
 
 	modelShaders->Use();
-
-	glm::mat4 fullModelShaderMatrix = PVMatrix * lightSource->model.GetModelMatrix();
 
 	modelShaders->SetMat4("ModelMatrix", lightSource->model.GetModelMatrix());
 	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
@@ -231,6 +224,8 @@ int main(int argc, const char* argv[])
 	const fs::path modelFSPath = fs::canonical(execPath / "modelFS.glsl");
 	const fs::path lightingVSPath = fs::canonical(execPath / "lightingVS.glsl");
 	const fs::path lightingFSPath = fs::canonical(execPath / "lightingFS.glsl");
+	const fs::path noTransformVSPath = fs::canonical(execPath / "noTransformVS.glsl");
+	const fs::path noTransformFSPath = fs::canonical(execPath / "noTransformFS.glsl");
 	const fs::path lightModelPath = fs::canonical(execPath / "lightModel.txt");
 
 	std::cout << "Loading shaders from \n\t" << modelVSPath << ",\n\t" << modelFSPath << std::endl;
@@ -239,16 +234,19 @@ int main(int argc, const char* argv[])
 	std::cout << "Loading shaders from \n\t" << lightingVSPath << ",\n\t" << lightingFSPath << std::endl;
 	lightingShaders = new ShaderProgram(lightingVSPath.string(), lightingFSPath.string());
 
+	std::cout << "Loading shaders from \n\t" << noTransformVSPath << ",\n\t" << noTransformFSPath << std::endl;
+	noTransformShaders = new ShaderProgram(noTransformVSPath.string(), noTransformFSPath.string());
+
 	camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	std::cout << "Loading model from \n\t" << modelPath << std::endl;
-	model = new Model(modelPath.string(), true);
+	model = new Mesh(modelPath.string(), true);
 
 	std::cout << "Loading light source model from \n\t" << lightModelPath << std::endl;
-	lightSource = new LightSource(std::move(Model(lightModelPath.string(), true)));
+	lightSource = new LightSource(std::move(Mesh(lightModelPath.string(), true)));
 
-	lightSource->model.Translate(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
-	//lightSource->model.SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+	lightSource->model.SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+	lightSource->model.Scale(glm::vec3(0.2f));
 
 	std::cout << std::endl;
 
@@ -259,7 +257,7 @@ int main(int argc, const char* argv[])
 		lastFrame = currentFrame;
 
 		model->Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
-		//lightSource->model.Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
+		lightSource->model.Rotate(glm::vec3(0.0f, deltaTime, 0.0f));
 
 		DisplayFPS(currentFrame);
 		PerformKeysActions(window);

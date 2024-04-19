@@ -4,7 +4,7 @@
     <ClCompile Include="ShaderProgram.cpp">
       <Filter>Source FIles</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
+    <ClCompile Include="Mesh.cpp">
       <Filter>Source FIles</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -24,7 +24,7 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
+    <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShaderProgram.h">
@@ -53,6 +53,15 @@
     <None Include="lightingFS.glsl">
       <Filter>Resources\Shaders</Filter>
     </None>
+    <None Include="noTransformVS.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="noTransformFS.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="box_stack.mtl">
+      <Filter>Resources\Models</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source FIles">
@@ -78,5 +87,13 @@
     <Text Include="lightModel.txt">
       <Filter>Resources\Models</Filter>
     </Text>
+    <Text Include="glErrors.txt">
+      <Filter>Resources</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="box_stack.obj">
+      <Filter>Resources\Models</Filter>
+    </Object>
   </ItemGroup>
 </Project>

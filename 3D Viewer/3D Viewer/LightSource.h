@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Utils.h"
-#include "Model.h"
+#include "Mesh.h"
 
 class LightSource
 {
 public:
-	LightSource(const Model& model);
-	LightSource(Model&& model);
+	LightSource(const Mesh& model);
+	LightSource(Mesh&& model);
 
 	float GetAmbientStrength() const;
 	float GetSpecularStrength() const;
@@ -22,7 +22,7 @@ public:
 	void SetLightColor(const glm::vec3& lightColor);
 
 public:
-	Model model;
+	Mesh model;
 
 private:
 

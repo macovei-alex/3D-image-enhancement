@@ -1,8 +1,8 @@
-#include "Model.h"
+#include "Mesh.h"
 
 #include "Utils.h"
 
-Model::Model(const std::string& filePath, bool makeCentered)
+Mesh::Mesh(const std::string& filePath, bool makeCentered)
 	: modelMatrix(glm::mat4(1.0f)), isCentered(false)
 {
 	std::ifstream fin(filePath);
@@ -27,81 +27,81 @@ Model::Model(const std::string& filePath, bool makeCentered)
 	InitBuffers();
 }
 
-Model::Model(Model&& model) noexcept
-	: vertices(std::move(model.vertices)), modelMatrix(std::move(model.modelMatrix))
+Mesh::Mesh(Mesh&& mesh) noexcept
+	: vertices(std::move(mesh.vertices)), indices(std::move(mesh.indices)), modelMatrix(std::move(mesh.modelMatrix))
 {
-	VAO = model.VAO;
-	VBO = model.VBO;
-	EBO = model.EBO;
-	isCentered = model.isCentered;
+	VAO = mesh.VAO;
+	VBO = mesh.VBO;
+	EBO = mesh.EBO;
+	isCentered = mesh.isCentered;
 
-	model.VAO = 0;
-	model.VBO = 0;
-	model.EBO = 0;
-	model.isCentered = false;
+	mesh.VAO = 0;
+	mesh.VBO = 0;
+	mesh.EBO = 0;
+	mesh.isCentered = false;
 }
 
-Model::Model(const Model& model)
+Mesh::Mesh(const Mesh& model)
 	: vertices(model.vertices), modelMatrix(model.modelMatrix)
 {
 	InitBuffers();
 	isCentered = model.isCentered;
 }
 
-Model::~Model()
+Mesh::~Mesh()
 {
 	DestroyBuffers();
 }
 
-glm::mat4 Model::GetModelMatrix() const
+glm::mat4 Mesh::GetModelMatrix() const
 {
 	return modelMatrix;
 }
 
-glm::vec3 Model::GetPosition() const
+glm::vec3 Mesh::GetPosition() const
 {
 	return glm::vec3(modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2]);
 }
 
-void Model::SetPosition(const glm::vec3& position)
+void Mesh::SetPosition(const glm::vec3& position)
 {
 	modelMatrix[3][0] = position.x;
 	modelMatrix[3][1] = position.y;
 	modelMatrix[3][2] = position.z;
 }
 
-void Model::SetScale(const glm::vec3& scale)
+void Mesh::SetScale(const glm::vec3& scale)
 {
 	modelMatrix[0][0] = scale.x;
 	modelMatrix[1][1] = scale.y;
 	modelMatrix[2][2] = scale.z;
 }
 
-void Model::SetRotation(const glm::vec3& rotation)
+void Mesh::SetRotation(const glm::vec3& rotation)
 {
 	modelMatrix = glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Model::Translate(const glm::vec3& translation)
+void Mesh::Translate(const glm::vec3& translation)
 {
 	modelMatrix = glm::translate(modelMatrix, translation);
 }
 
-void Model::Scale(const glm::vec3& scale)
+void Mesh::Scale(const glm::vec3& scale)
 {
 	modelMatrix = glm::scale(modelMatrix, scale);
 }
 
-void Model::Rotate(const glm::vec3& rotation)
+void Mesh::Rotate(const glm::vec3& rotation)
 {
 	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Model::CenterModel()
+void Mesh::CenterModel()
 {
 	if (isCentered)
 		return;
@@ -121,7 +121,7 @@ void Model::CenterModel()
 	InitBuffers();
 }
 
-void Model::ReadVertices(std::istream& fin)
+void Mesh::ReadVertices(std::istream& fin)
 {
 	int vertexCount;
 	fin >> vertexCount;
@@ -154,7 +154,7 @@ void Model::ReadVertices(std::istream& fin)
 	*/
 }
 
-void Model::ReadIndices(std::istream& fin)
+void Mesh::ReadIndices(std::istream& fin)
 {
 	unsigned int indexCount;
 	fin >> indexCount;
@@ -169,7 +169,7 @@ void Model::ReadIndices(std::istream& fin)
 	}
 }
 
-void Model::CalculateNormals()
+void Mesh::CalculateNormals()
 {
 	for (int i = 0; i < indices.size(); i += 3)
 	{
@@ -189,7 +189,7 @@ void Model::CalculateNormals()
 	}
 }
 
-void Model::InitBuffers()
+void Mesh::InitBuffers()
 {
 	GLCall(glGenVertexArrays(1, &VAO));
 	GLCall(glBindVertexArray(VAO));
@@ -206,31 +206,30 @@ void Model::InitBuffers()
 	GLCall(glEnableVertexAttribArray(1));
 	GLCall(glVertexAttribPointer(1, dimof(vertices[0].normal), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal)));
 
-	// vertex texture coords
+	// vertex color coords
 	GLCall(glEnableVertexAttribArray(2));
 	GLCall(glVertexAttribPointer(2, dimof(vertices[0].color), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color)));
-
-	GLCall(glBindVertexArray(0));
 
 	GLCall(glGenBuffers(1, &EBO));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
 	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), indices.data(), GL_STATIC_DRAW));
 
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+	GLCall(glBindVertexArray(0));
 }
 
-void Model::Render() const
+void Mesh::Render() const
 {
 	GLCall(glBindVertexArray(VAO));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
 
-	GLCall(glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0));
+	GLCall(glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, nullptr));
 
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 	GLCall(glBindVertexArray(0));
 }
 
-void Model::DestroyBuffers()
+void Mesh::DestroyBuffers()
 {
 	GLCall(glBindVertexArray(0));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
