@@ -191,56 +191,56 @@ void Model::CalculateNormals()
 
 void Model::InitBuffers()
 {
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	GLCall(glGenVertexArrays(1, &VAO));
+	GLCall(glBindVertexArray(VAO));
 
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), vertices.data(), GL_STATIC_DRAW);
+	GLCall(glGenBuffers(1, &VBO));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), vertices.data(), GL_STATIC_DRAW));
 
 	// vertex Positions
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, dimof(vertices[0].position), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+	GLCall(glEnableVertexAttribArray(0));
+	GLCall(glVertexAttribPointer(0, dimof(vertices[0].position), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position)));
 
 	// vertex normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, dimof(vertices[0].normal), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	GLCall(glEnableVertexAttribArray(1));
+	GLCall(glVertexAttribPointer(1, dimof(vertices[0].normal), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal)));
 
 	// vertex texture coords
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, dimof(vertices[0].color), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	GLCall(glEnableVertexAttribArray(2));
+	GLCall(glVertexAttribPointer(2, dimof(vertices[0].color), GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color)));
 
-	glBindVertexArray(0);
+	GLCall(glBindVertexArray(0));
 
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), indices.data(), GL_STATIC_DRAW);
+	GLCall(glGenBuffers(1, &EBO));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
+	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices[0]), indices.data(), GL_STATIC_DRAW));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
 void Model::Render() const
 {
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	GLCall(glBindVertexArray(VAO));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
 
-	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, nullptr);
+	GLCall(glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0));
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+	GLCall(glBindVertexArray(0));
 }
 
 void Model::DestroyBuffers()
 {
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	GLCall(glBindVertexArray(0));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
 	if(EBO != 0)
-		glDeleteBuffers(1, &EBO);
+		GLCall(glDeleteBuffers(1, &EBO));
 	if(VBO != 0)
-		glDeleteBuffers(1, &VBO);
+		GLCall(glDeleteBuffers(1, &VBO));
 	if(VAO != 0)
-		glDeleteVertexArrays(1, &VAO);
+		GLCall(glDeleteVertexArrays(1, &VAO));
 
 	VAO = 0;
 	VBO = 0;

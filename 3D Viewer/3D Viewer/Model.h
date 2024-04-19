@@ -12,7 +12,6 @@ public:
 	~Model();
 
 	void Render() const;
-	void SetupMesh();
 
 	glm::mat4 GetModelMatrix() const;
 	glm::vec3 GetPosition() const;
@@ -29,7 +28,6 @@ public:
 
 private:
 	void ReadVertices(std::istream& fin);
-	void ReadColors(std::istream& fin);
 	void ReadIndices(std::istream& fin);
 
 	void CalculateNormals();

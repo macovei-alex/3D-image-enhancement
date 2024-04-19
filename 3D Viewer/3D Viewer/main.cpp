@@ -111,7 +111,6 @@ void InitializeGraphics()
 	glEnable(GL_COLOR_MATERIAL);
 	glDisable(GL_LIGHTING);
 
-	// Eliminam cullingul deoarece modelele vor avea doar fata exterioara
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 }
@@ -162,6 +161,8 @@ void RenderFrame()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glm::mat4 PVMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
+
 	lightingShaders->Use();
 
 	lightingShaders->SetVec3("LightColor", lightSource->GetColor());
@@ -173,6 +174,8 @@ void RenderFrame()
 	lightingShaders->SetFloat("SpecularStrength", lightSource->GetSpecularStrength());
 	lightingShaders->SetInt("SpecularExponent", lightSource->GetSpecularExponent());
 
+	glm::mat4 fullLightingShaderMatrix = PVMatrix * model->GetModelMatrix();
+
 	lightingShaders->SetMat4("ModelMatrix", model->GetModelMatrix());
 	lightingShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
 	lightingShaders->SetMat4("ProjectionMatrix", camera->GetProjectionMatrix());
@@ -180,6 +183,8 @@ void RenderFrame()
 	model->Render();
 
 	modelShaders->Use();
+
+	glm::mat4 fullModelShaderMatrix = PVMatrix * lightSource->model.GetModelMatrix();
 
 	modelShaders->SetMat4("ModelMatrix", lightSource->model.GetModelMatrix());
 	modelShaders->SetMat4("ViewMatrix", camera->GetViewMatrix());
@@ -242,7 +247,8 @@ int main(int argc, const char* argv[])
 	std::cout << "Loading light source model from \n\t" << lightModelPath << std::endl;
 	lightSource = new LightSource(std::move(Model(lightModelPath.string(), true)));
 
-	lightSource->model.SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+	lightSource->model.Translate(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+	//lightSource->model.SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
 
 	std::cout << std::endl;
 
