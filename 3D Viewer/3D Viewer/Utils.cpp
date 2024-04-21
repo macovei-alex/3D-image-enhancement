@@ -1,4 +1,4 @@
-#include "Utils.h"
+#include "utils.h"
 
 std::ostream& operator<<(std::ostream& os, const glm::vec3& vector)
 {

@@ -1,9 +1,9 @@
 #include "Model.h"
 
-#include "Utils.h"
+#include "utils.h"
 
 Model::Model(const std::string& filePath)
-	: modelMatrix(glm::mat4(1.0f)), isCentered(false)
+	: modelMatrix(glm::mat4(1.0f))
 {
 	std::ifstream fin(filePath);
 	std::string line;
@@ -32,19 +32,16 @@ Model::Model(Model&& model) noexcept
 	VAO = model.VAO;
 	VBO = model.VBO;
 	EBO = model.EBO;
-	isCentered = model.isCentered;
 
 	model.VAO = 0;
 	model.VBO = 0;
 	model.EBO = 0;
-	model.isCentered = false;
 }
 
 Model::Model(const Model& model)
 	: vertices(model.vertices), modelMatrix(model.modelMatrix)
 {
 	InitBuffers();
-	isCentered = model.isCentered;
 }
 
 Model::~Model()

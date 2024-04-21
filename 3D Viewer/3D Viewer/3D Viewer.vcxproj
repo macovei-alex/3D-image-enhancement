@@ -22,16 +22,18 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="LightSource.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ShaderProgram.h" />
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -148,17 +150,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy lightingFS.glsl "..\x64\Debug\lightingFS.glsl" &amp; copy lightingVS.glsl "..\x64\Debug\lightingVS.glsl" &amp; 
-copy modelFS.glsl "..\x64\Debug\modelFS.glsl" &amp; copy modelVS.glsl "..\x64\Debug\modelVS.glsl" &amp; 
-copy lightModel.txt "..\x64\Debug\lightModel.txt" &amp; copy model.txt "..\x64\Debug\model.txt" &amp; 
-copy noTransformVS.glsl "..\x64\Debug\noTransformVS.glsl" &amp; copy noTransformFS.glsl "..\x64\Debug\noTransformFS.glsl"
-</Command>
+      <Command>postbuild.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,6 +169,7 @@ copy noTransformVS.glsl "..\x64\Debug\noTransformVS.glsl" &amp; copy noTransform
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -178,11 +178,7 @@ copy noTransformVS.glsl "..\x64\Debug\noTransformVS.glsl" &amp; copy noTransform
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy lightingFS.glsl "..\x64\Debug\lightingFS.glsl" &amp; copy lightingVS.glsl "..\x64\Debug\lightingVS.glsl" &amp; 
-copy modelFS.glsl "..\x64\Debug\modelFS.glsl" &amp; copy modelVS.glsl "..\x64\Debug\modelVS.glsl" &amp; 
-copy lightModel.txt "..\x64\Debug\lightModel.txt" &amp; copy model.txt "..\x64\Debug\model.txt" &amp; 
-copy noTransformVS.glsl "..\x64\Debug\noTransformVS.glsl" &amp; copy noTransformFS.glsl "..\x64\Debug\noTransformFS.glsl"
-</Command>
+      <Command>postbuild.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

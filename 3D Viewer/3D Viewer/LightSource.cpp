@@ -1,12 +1,12 @@
 #include "LightSource.h"
 
-LightSource::LightSource(const Mesh& model)
+LightSource::LightSource(const Model& model)
 	: model(model)
 {
 	// empty
 }
 
-LightSource::LightSource(Mesh&& model)
+LightSource::LightSource(Model&& model)
 	: model(std::move(model))
 {
 	// empty

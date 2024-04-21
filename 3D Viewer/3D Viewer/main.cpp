@@ -2,11 +2,11 @@
 #pragma comment (lib, "glew32s.lib")
 #pragma comment (lib, "OpenGL32.lib")
 
-#include "Utils.h"
+#include "utils.h"
 
 #include "Camera.h"
 #include "ShaderProgram.h"
-#include "Mesh.h"
+#include "Model.h"
 #include "LightSource.h"
 
 namespace fs = std::filesystem;
@@ -19,7 +19,7 @@ float lastFrame = 0.0f;
 
 ShaderProgram* modelShaders, * lightingShaders, * noTransformShaders;
 Camera* camera;
-Mesh* model;
+Model* model;
 LightSource* lightSource;
 
 void DisplayFPS(double currentTime)
@@ -188,19 +188,25 @@ void RenderFrame()
 
 int main(int argc, const char* argv[])
 {
-	std::cout << std::endl;
-
-	const fs::path execPath = fs::canonical(argv[0]).remove_filename();
+	const fs::path execDirPath = fs::canonical(argv[0]).remove_filename();
 
 	fs::path modelPath;
 	if (argc < 2)
 	{
-		modelPath = fs::canonical(execPath / "model.txt");
+		modelPath = fs::canonical(execDirPath / "Models\\model.txt");
 		std::cout << "A model file path wasn't give; Using the replacement model from: \n\t" << modelPath << std::endl;
 	}
 	else
 	{
-		modelPath = fs::absolute(fs::canonical(argv[1]));
+		try
+		{
+			modelPath = fs::absolute(fs::canonical(argv[1]));
+		}
+		catch (const std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+			modelPath = fs::canonical(execDirPath / "Models\\model.txt");
+		}
 	}
 
 	if (!fs::exists(modelPath))
@@ -220,13 +226,16 @@ int main(int argc, const char* argv[])
 	}
 	InitializeGraphics();
 
-	const fs::path modelVSPath = fs::canonical(execPath / "modelVS.glsl");
-	const fs::path modelFSPath = fs::canonical(execPath / "modelFS.glsl");
-	const fs::path lightingVSPath = fs::canonical(execPath / "lightingVS.glsl");
-	const fs::path lightingFSPath = fs::canonical(execPath / "lightingFS.glsl");
-	const fs::path noTransformVSPath = fs::canonical(execPath / "noTransformVS.glsl");
-	const fs::path noTransformFSPath = fs::canonical(execPath / "noTransformFS.glsl");
-	const fs::path lightModelPath = fs::canonical(execPath / "lightModel.txt");
+	const fs::path modelVSPath = fs::canonical(execDirPath / "Shaders\\modelVS.glsl");
+	const fs::path modelFSPath = fs::canonical(execDirPath / "Shaders\\modelFS.glsl");
+
+	const fs::path lightingVSPath = fs::canonical(execDirPath / "Shaders\\lightingVS.glsl");
+	const fs::path lightingFSPath = fs::canonical(execDirPath / "Shaders\\lightingFS.glsl");
+
+	const fs::path noTransformVSPath = fs::canonical(execDirPath / "Shaders\\noTransformVS.glsl");
+	const fs::path noTransformFSPath = fs::canonical(execDirPath / "Shaders\\noTransformFS.glsl");
+
+	const fs::path lightModelPath = fs::canonical(execDirPath / "Models\\lightModel.txt");
 
 	std::cout << "Loading shaders from \n\t" << modelVSPath << ",\n\t" << modelFSPath << std::endl;
 	modelShaders = new ShaderProgram(modelVSPath.string(), modelFSPath.string());
@@ -240,10 +249,10 @@ int main(int argc, const char* argv[])
 	camera = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	std::cout << "Loading model from \n\t" << modelPath << std::endl;
-	model = new Mesh(modelPath.string(), true);
+	model = new Model(modelPath.string());
 
 	std::cout << "Loading light source model from \n\t" << lightModelPath << std::endl;
-	lightSource = new LightSource(std::move(Mesh(lightModelPath.string(), true)));
+	lightSource = new LightSource(std::move(Model(lightModelPath.string())));
 
 	lightSource->model.SetPosition(camera->GetPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
 	lightSource->model.Scale(glm::vec3(0.2f));
