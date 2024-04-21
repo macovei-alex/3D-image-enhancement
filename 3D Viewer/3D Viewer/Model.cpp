@@ -1,8 +1,8 @@
-#include "Mesh.h"
+#include "Model.h"
 
 #include "Utils.h"
 
-Mesh::Mesh(const std::string& filePath, bool makeCentered)
+Model::Model(const std::string& filePath)
 	: modelMatrix(glm::mat4(1.0f)), isCentered(false)
 {
 	std::ifstream fin(filePath);
@@ -19,95 +19,89 @@ Mesh::Mesh(const std::string& filePath, bool makeCentered)
 	VAO = 0;
 	VBO = 0;
 	EBO = 0;
-
-	if (makeCentered)
-		CenterModel();
+	
+	CenterModel();
 
 	CalculateNormals();
 	InitBuffers();
 }
 
-Mesh::Mesh(Mesh&& mesh) noexcept
-	: vertices(std::move(mesh.vertices)), indices(std::move(mesh.indices)), modelMatrix(std::move(mesh.modelMatrix))
+Model::Model(Model&& model) noexcept
+	: vertices(std::move(model.vertices)), indices(std::move(model.indices)), modelMatrix(std::move(model.modelMatrix))
 {
-	VAO = mesh.VAO;
-	VBO = mesh.VBO;
-	EBO = mesh.EBO;
-	isCentered = mesh.isCentered;
+	VAO = model.VAO;
+	VBO = model.VBO;
+	EBO = model.EBO;
+	isCentered = model.isCentered;
 
-	mesh.VAO = 0;
-	mesh.VBO = 0;
-	mesh.EBO = 0;
-	mesh.isCentered = false;
+	model.VAO = 0;
+	model.VBO = 0;
+	model.EBO = 0;
+	model.isCentered = false;
 }
 
-Mesh::Mesh(const Mesh& model)
+Model::Model(const Model& model)
 	: vertices(model.vertices), modelMatrix(model.modelMatrix)
 {
 	InitBuffers();
 	isCentered = model.isCentered;
 }
 
-Mesh::~Mesh()
+Model::~Model()
 {
 	DestroyBuffers();
 }
 
-glm::mat4 Mesh::GetModelMatrix() const
+glm::mat4 Model::GetModelMatrix() const
 {
 	return modelMatrix;
 }
 
-glm::vec3 Mesh::GetPosition() const
+glm::vec3 Model::GetPosition() const
 {
 	return glm::vec3(modelMatrix[3][0], modelMatrix[3][1], modelMatrix[3][2]);
 }
 
-void Mesh::SetPosition(const glm::vec3& position)
+void Model::SetPosition(const glm::vec3& position)
 {
 	modelMatrix[3][0] = position.x;
 	modelMatrix[3][1] = position.y;
 	modelMatrix[3][2] = position.z;
 }
 
-void Mesh::SetScale(const glm::vec3& scale)
+void Model::SetScale(const glm::vec3& scale)
 {
 	modelMatrix[0][0] = scale.x;
 	modelMatrix[1][1] = scale.y;
 	modelMatrix[2][2] = scale.z;
 }
 
-void Mesh::SetRotation(const glm::vec3& rotation)
+void Model::SetRotation(const glm::vec3& rotation)
 {
 	modelMatrix = glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Mesh::Translate(const glm::vec3& translation)
+void Model::Translate(const glm::vec3& translation)
 {
 	modelMatrix = glm::translate(modelMatrix, translation);
 }
 
-void Mesh::Scale(const glm::vec3& scale)
+void Model::Scale(const glm::vec3& scale)
 {
 	modelMatrix = glm::scale(modelMatrix, scale);
 }
 
-void Mesh::Rotate(const glm::vec3& rotation)
+void Model::Rotate(const glm::vec3& rotation)
 {
 	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Mesh::CenterModel()
+void Model::CenterModel()
 {
-	if (isCentered)
-		return;
-
-	DestroyBuffers();
-
 	glm::vec3 center = glm::vec3(0.0f);
 	for (auto& vertex : vertices)
 		center += vertex.position;
@@ -116,12 +110,9 @@ void Mesh::CenterModel()
 
 	for (auto& vertex : vertices)
 		vertex.position -= center;
-
-	isCentered = true;
-	InitBuffers();
 }
 
-void Mesh::ReadVertices(std::istream& fin)
+void Model::ReadVertices(std::istream& fin)
 {
 	int vertexCount;
 	fin >> vertexCount;
@@ -154,7 +145,7 @@ void Mesh::ReadVertices(std::istream& fin)
 	*/
 }
 
-void Mesh::ReadIndices(std::istream& fin)
+void Model::ReadIndices(std::istream& fin)
 {
 	unsigned int indexCount;
 	fin >> indexCount;
@@ -169,7 +160,7 @@ void Mesh::ReadIndices(std::istream& fin)
 	}
 }
 
-void Mesh::CalculateNormals()
+void Model::CalculateNormals()
 {
 	for (int i = 0; i < indices.size(); i += 3)
 	{
@@ -189,7 +180,7 @@ void Mesh::CalculateNormals()
 	}
 }
 
-void Mesh::InitBuffers()
+void Model::InitBuffers()
 {
 	GLCall(glGenVertexArrays(1, &VAO));
 	GLCall(glBindVertexArray(VAO));
@@ -218,7 +209,7 @@ void Mesh::InitBuffers()
 	GLCall(glBindVertexArray(0));
 }
 
-void Mesh::Render() const
+void Model::Render() const
 {
 	GLCall(glBindVertexArray(VAO));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
@@ -229,7 +220,7 @@ void Mesh::Render() const
 	GLCall(glBindVertexArray(0));
 }
 
-void Mesh::DestroyBuffers()
+void Model::DestroyBuffers()
 {
 	GLCall(glBindVertexArray(0));
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));

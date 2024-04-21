@@ -22,37 +22,36 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="LightSource.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="box_stack.mtl" />
-    <None Include="lightingFS.glsl" />
-    <None Include="modelFS.glsl" />
-    <None Include="lightingVS.glsl" />
-    <None Include="modelVS.glsl" />
-    <None Include="noTransformFS.glsl" />
-    <None Include="noTransformVS.glsl" />
+    <None Include="Models\box_stack.mtl" />
+    <None Include="Shaders\lightingFS.glsl" />
+    <None Include="Shaders\lightingVS.glsl" />
+    <None Include="Shaders\modelFS.glsl" />
+    <None Include="Shaders\modelVS.glsl" />
+    <None Include="Shaders\noTransformFS.glsl" />
+    <None Include="Shaders\noTransformVS.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="glErrors.txt" />
-    <Text Include="lightModel.txt" />
-    <Text Include="model.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="box_stack.obj">
+    <Object Include="Models\box_stack.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Models\lightModel.txt" />
+    <Text Include="Models\model.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -3,13 +3,13 @@
 #include "Utils.h"
 #include "Vertex.h"
 
-class Mesh
+class Model
 {
 public:
-	Mesh(const std::string& filePath, bool makeCentered = false);
-	Mesh(Mesh&& model) noexcept;
-	Mesh(const Mesh&);
-	~Mesh();
+	Model(const std::string& filePath);
+	Model(Model&& model) noexcept;
+	Model(const Model&);
+	~Model();
 
 	void Render() const;
 
@@ -42,5 +42,4 @@ private:
 	GLuint VAO, VBO, EBO;
 
 	glm::mat4 modelMatrix;
-	bool isCentered;
 };
