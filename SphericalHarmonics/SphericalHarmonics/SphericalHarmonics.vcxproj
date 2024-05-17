@@ -127,7 +127,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ALGLIB\alglibinternal.cpp" />
+    <ClCompile Include="ALGLIB\alglibmisc.cpp" />
+    <ClCompile Include="ALGLIB\ap.cpp" />
+    <ClCompile Include="ALGLIB\dataanalysis.cpp" />
+    <ClCompile Include="ALGLIB\diffequations.cpp" />
+    <ClCompile Include="ALGLIB\fasttransforms.cpp" />
+    <ClCompile Include="ALGLIB\integration.cpp" />
+    <ClCompile Include="ALGLIB\interpolation.cpp" />
+    <ClCompile Include="ALGLIB\kernels_avx2.cpp" />
+    <ClCompile Include="ALGLIB\kernels_fma.cpp" />
+    <ClCompile Include="ALGLIB\kernels_sse2.cpp" />
+    <ClCompile Include="ALGLIB\linalg.cpp" />
+    <ClCompile Include="ALGLIB\optimization.cpp" />
+    <ClCompile Include="ALGLIB\solvers.cpp" />
+    <ClCompile Include="ALGLIB\specialfunctions.cpp" />
+    <ClCompile Include="ALGLIB\statistics.cpp" />
     <ClCompile Include="Source.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ALGLIB\alglibinternal.h" />
+    <ClInclude Include="ALGLIB\alglibmisc.h" />
+    <ClInclude Include="ALGLIB\ap.h" />
+    <ClInclude Include="ALGLIB\dataanalysis.h" />
+    <ClInclude Include="ALGLIB\diffequations.h" />
+    <ClInclude Include="ALGLIB\fasttransforms.h" />
+    <ClInclude Include="ALGLIB\integration.h" />
+    <ClInclude Include="ALGLIB\interpolation.h" />
+    <ClInclude Include="ALGLIB\kernels_avx2.h" />
+    <ClInclude Include="ALGLIB\kernels_fma.h" />
+    <ClInclude Include="ALGLIB\kernels_sse2.h" />
+    <ClInclude Include="ALGLIB\linalg.h" />
+    <ClInclude Include="ALGLIB\optimization.h" />
+    <ClInclude Include="ALGLIB\solvers.h" />
+    <ClInclude Include="ALGLIB\specialfunctions.h" />
+    <ClInclude Include="ALGLIB\statistics.h" />
+    <ClInclude Include="ALGLIB\stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
